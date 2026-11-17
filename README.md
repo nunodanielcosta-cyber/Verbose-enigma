@@ -17,7 +17,21 @@ O **OtoDita** (*Oto* + *ditar*) é uma aplicação web local para a consulta de 
 
 ## Como iniciar
 
-Precisa de Python 3 (só para servir os ficheiros em `localhost`, o que o microfone exige) e de Chrome ou Edge.
+### Windows — `OtoDita.exe` (recomendado)
+
+1. Copie `dist/OtoDita.exe` para o computador (ex.: Ambiente de Trabalho). Não é preciso instalar nada.
+2. Faça duplo clique. A aplicação abre numa janela própria (Edge ou Chrome) em `http://localhost:8765`.
+3. Mantenha aberta a pequena janela preta «OtoDita» enquanto usa a aplicação. Fechá-la termina o OtoDita.
+
+Notas:
+- Na primeira execução, o Windows SmartScreen pode avisar que a aplicação não é reconhecida (o executável não tem assinatura digital). Clique em **Mais informações → Executar mesmo assim**.
+- O `.exe` faz de ponte para o Ollama local, por isso **não é preciso configurar `OLLAMA_ORIGINS`**. Basta instalar o Ollama e o modelo.
+- Na primeira vez que ditar, autorize o microfone na janela da aplicação.
+- Abrir o `.exe` uma segunda vez apenas abre outra janela.
+
+### Alternativa (sem .exe)
+
+Precisa de Python 3 e de Chrome ou Edge.
 
 - **Windows:** duplo clique em `iniciar.bat`
 - **macOS/Linux:** `./iniciar.sh`
@@ -30,7 +44,7 @@ Abra depois `http://localhost:8765`.
    ```
    ollama pull qwen2.5:7b
    ```
-2. Permita pedidos a partir da página do OtoDita:
+2. *(Apenas se não usar o `OtoDita.exe`)* Permita pedidos a partir da página do OtoDita:
    - Windows (PowerShell): `setx OLLAMA_ORIGINS "http://localhost:8765"` e reinicie o Ollama
    - macOS: `launchctl setenv OLLAMA_ORIGINS "http://localhost:8765"` e reinicie o Ollama
    - Linux: `OLLAMA_ORIGINS=http://localhost:8765 ollama serve`
@@ -70,6 +84,16 @@ js/whisper-worker.js  Whisper no navegador (transformers.js)
 js/sclinico.js        formatação e cópia para o SClinico
 assets/logo.svg       logótipo
 tests/                testes (npm test)
+launcher/             código do OtoDita.exe (Go): servidor local + ponte Ollama
+dist/OtoDita.exe      executável para Windows
+```
+
+### Recompilar o `.exe`
+
+Requer Go 1.22+ e `go install github.com/tc-hib/go-winres@v0.3.3`:
+
+```
+VERSION=1.0.0 ./launcher/build.sh
 ```
 
 ## Aviso

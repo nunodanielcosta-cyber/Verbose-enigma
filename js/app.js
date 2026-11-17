@@ -46,8 +46,24 @@ function loadSettings() {
   } catch { return { ...DEFAULTS }; }
 }
 const settings = loadSettings();
+// Quando aberto pelo OtoDita.exe, o Ollama é acedido pela ponte local /ollama (sem configurar CORS)
+let launcherProxy = null;
 function saveSettings() {
-  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch { /* sem armazenamento */ }
+  const toSave = { ...settings };
+  if (launcherProxy && toSave.llmUrl === launcherProxy) toSave.llmUrl = DEFAULTS.llmUrl;
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(toSave)); } catch { /* sem armazenamento */ }
+}
+async function detectLauncher() {
+  if (location.protocol === 'file:') return;
+  try {
+    const res = await fetch('launcher.json', { cache: 'no-store' });
+    if (!res.ok) return;
+    const info = await res.json();
+    if (info.app !== 'OtoDita' || !info.ollamaProxy) return;
+    launcherProxy = location.origin + info.ollamaProxy;
+    const isDefault = /^http:\/\/(localhost|127\.0\.0\.1):11434\/?$/.test(settings.llmUrl);
+    if (settings.llmProvider === 'ollama' && isDefault) settings.llmUrl = launcherProxy;
+  } catch { /* servido por outro servidor */ }
 }
 
 /* ------------------------------------------------------------------ */
@@ -625,6 +641,7 @@ $$('[data-setting]').forEach((el) => {
 $('#resetSettings').addEventListener('click', () => {
   if (!confirm('Repor todas as definições?')) return;
   Object.assign(settings, DEFAULTS);
+  if (launcherProxy) settings.llmUrl = launcherProxy;
   saveSettings();
   syncSettingsForm();
   editors.forEach((e) => e.renderOutput());
@@ -689,6 +706,7 @@ document.addEventListener('keydown', (e) => {
 /* ------------------------------------------------------------------ */
 /* Arranque                                                            */
 /* ------------------------------------------------------------------ */
+await detectLauncher();
 syncSettingsForm();
 loadDraft();
 updateRecButtons();

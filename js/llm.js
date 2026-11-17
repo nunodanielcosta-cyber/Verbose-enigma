@@ -105,6 +105,7 @@ export async function organizeWithLLM(text, mode, settings, { signal, onProgress
       });
       if (!res.ok) {
         const body = await res.text();
+        if (res.status === 502) throw new Error('O Ollama não está a correr neste computador. Abra a aplicação Ollama e tente de novo.');
         if (res.status === 404) throw new Error(`Modelo "${settings.llmModel}" não encontrado no Ollama. Instale com: ollama pull ${settings.llmModel}`);
         throw new Error(`Ollama respondeu ${res.status}: ${body.slice(0, 300)}`);
       }
