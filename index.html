@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OtoDita</title>
+  <meta name="description" content="OtoDita — ditado clínico e registo de consulta para Otorrinolaringologia, com IA local, pronto a copiar para o SClinico.">
+  <meta name="theme-color" content="#0B4F7A">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/logo.svg" alt="" width="40" height="40">
+      <div>
+        <h1>Oto<span>Dita</span></h1>
+        <p>Ditado clínico ORL &rarr; SClinico</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Secções">
+      <button role="tab" class="tab active" data-tab="ditado" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2Z"/></svg>
+        Ditado
+      </button>
+      <button role="tab" class="tab" data-tab="consulta" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0-5a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></svg>
+        Gravar consulta
+      </button>
+      <button role="tab" class="tab" data-tab="definicoes" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.5 7.5 0 0 0-1.7-1L15 3h-4l-.4 2.9a7.5 7.5 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.6 7.6 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.5 7.5 0 0 0 1.7 1L11 21h4l.4-2.9a7.5 7.5 0 0 0 1.7-1l2.5 1 2-3.5L19.4 13ZM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z" transform="translate(-1 0)"/></svg>
+        Definições
+      </button>
+    </nav>
+    <button id="aiStatus" class="ai-status" title="Estado da IA local — clique para verificar">
+      <span class="dot"></span><span class="label">IA local: a verificar…</span>
+    </button>
+  </header>
+
+  <main>
+    <!-- ============ DITADO ============ -->
+    <section id="tab-ditado" class="panel active" role="tabpanel">
+      <div class="layout">
+        <div class="card dictate">
+          <div class="mic-row">
+            <button id="dictMic" class="mic" aria-label="Iniciar ditado" title="Iniciar/parar ditado (F2)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2Z"/></svg>
+            </button>
+            <div class="mic-info">
+              <strong id="dictState">Pronto a ditar</strong>
+              <span class="muted" id="dictEngineLabel">F2 inicia/para · diga o nome da secção antes do conteúdo</span>
+              <div class="level"><div id="dictLevel"></div></div>
+            </div>
+          </div>
+          <div id="dictInterim" class="interim" aria-live="polite"></div>
+
+          <label class="field-label" for="dictRaw">Texto ditado <span class="muted">(pode editar ou escrever)</span></label>
+          <textarea id="dictRaw" class="raw" rows="10" placeholder="Ex.: «Motivo da consulta dois pontos hipoacusia esquerda ponto. Refere hipoacusia esquerda progressiva há 6 meses com acufeno ponto. Otoscopia normal ponto. Acumetria dois pontos Weber lateralizado à direita, Rinne positivo bilateral ponto. Diagnóstico dois pontos hipoacusia neurossensorial esquerda ponto. Plano dois pontos pedir audiograma tonal e vocal e RM dos CAI ponto»"></textarea>
+
+          <div class="actions">
+            <button id="dictOrganize" class="btn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v2H3V5Zm0 6h12v2H3v-2Zm0 6h18v2H3v-2Z"/></svg>Organizar
+            </button>
+            <button id="dictAI" class="btn primary">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 2.1 5.9L20 10l-5.9 2.1L12 18l-2.1-5.9L4 10l5.9-2.1L12 2Zm7 13 1 2.6 2.6 1-2.6 1L19 22l-1-2.4-2.6-1 2.6-1L19 15Z"/></svg>Organizar com IA local
+            </button>
+            <label class="switch" title="Reorganiza o registo à medida que dita (regras locais)">
+              <input type="checkbox" id="dictAuto" checked><span></span>Organização automática
+            </label>
+            <span class="spacer"></span>
+            <button id="dictNew" class="btn ghost">Nova consulta</button>
+          </div>
+
+          <details class="help">
+            <summary>Comandos de voz e dicas</summary>
+            <div class="help-grid">
+              <div>
+                <h4>Secções (diga no início da frase)</h4>
+                <p>«Motivo da consulta», «Anamnese» / «História da doença atual», «Antecedentes», «Otoscopia», «Rinoscopia» / «Endoscopia nasal», «Orofaringe», «Laringoscopia» / «Nasofibrolaringoscopia», «Pescoço», «Acumetria» / «Exame vestibular», «Exames complementares», «Diagnóstico», «Plano», «Reavaliação…».</p>
+                <h4>Exame normal</h4>
+                <p>«Otoscopia normal», «Rinoscopia sem alterações», «Laringoscopia normal», «Pescoço normal», «Acumetria normal» inserem o texto-padrão (editável nas Definições → desligar expansão).</p>
+              </div>
+              <div>
+                <h4>Pontuação</h4>
+                <p>«ponto», «vírgula», «dois pontos», «ponto e vírgula», «ponto parágrafo», «nova linha», «abre/fecha parênteses», «barra» (8/8 h).</p>
+                <h4>Edição</h4>
+                <p>«apagar última frase» remove a última frase ditada. Pode sempre corrigir o texto à mão.</p>
+                <h4>Atalhos</h4>
+                <p><kbd>F2</kbd> ditar · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> copiar tudo para o SClinico.</p>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>Registo organizado</h2>
+            <span class="muted small">Edite livremente antes de copiar</span>
+          </div>
+          <div id="dictFields" class="fields"></div>
+        </div>
+      </div>
+
+      <div class="card output" id="dictOutputCard"></div>
+    </section>
+
+    <!-- ============ CONSULTA ============ -->
+    <section id="tab-consulta" class="panel" role="tabpanel" hidden>
+      <div class="layout">
+        <div class="card">
+          <div class="card-head"><h2>1 · Gravar a consulta</h2></div>
+          <label class="consent">
+            <input type="checkbox" id="consConsent">
+            <span>O doente foi informado e consentiu a gravação áudio da consulta. O áudio fica apenas na memória deste computador e é eliminado ao fechar a página.</span>
+          </label>
+          <div class="rec-row">
+            <button id="recStart" class="btn rec" disabled>
+              <span class="rec-dot"></span><span class="rec-label">Gravar</span>
+            </button>
+            <button id="recPause" class="btn" disabled>Pausa</button>
+            <button id="recStop" class="btn" disabled>Parar</button>
+            <span id="recTime" class="timer">00:00</span>
+            <div class="level grow"><div id="recLevel"></div></div>
+          </div>
+          <div class="file-row">
+            <label class="btn ghost small">
+              <input type="file" id="recFile" accept="audio/*,video/*" hidden>Carregar ficheiro de áudio
+            </label>
+            <audio id="recAudio" controls hidden></audio>
+            <button id="recDelete" class="btn ghost small danger" hidden>Eliminar gravação</button>
+          </div>
+
+          <div class="card-head mt"><h2>2 · Transcrever <span class="muted small">(Whisper local)</span></h2></div>
+          <div class="actions">
+            <button id="consTranscribe" class="btn" disabled>Transcrever áudio</button>
+            <button id="consCancel" class="btn ghost" hidden>Cancelar</button>
+          </div>
+          <div id="consProgress" class="progress" hidden>
+            <div class="bar"><div></div></div>
+            <span class="muted small"></span>
+          </div>
+          <label class="field-label" for="consTranscript">Transcrição <span class="muted">(pode corrigir ou colar texto)</span></label>
+          <textarea id="consTranscript" class="raw" rows="10" placeholder="A transcrição da consulta aparece aqui…"></textarea>
+
+          <div class="card-head mt"><h2>3 · Analisar e organizar</h2></div>
+          <div class="actions">
+            <button id="consAnalyze" class="btn primary">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 2.1 5.9L20 10l-5.9 2.1L12 18l-2.1-5.9L4 10l5.9-2.1L12 2Zm7 13 1 2.6 2.6 1-2.6 1L19 22l-1-2.4-2.6-1 2.6-1L19 15Z"/></svg>Analisar com IA local
+            </button>
+            <button id="consRules" class="btn">Organizar por regras</button>
+            <span class="spacer"></span>
+            <button id="consNew" class="btn ghost">Nova consulta</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h2>Registo da consulta</h2>
+            <span class="muted small">Reveja sempre o resultado da IA</span>
+          </div>
+          <div id="consFields" class="fields"></div>
+        </div>
+      </div>
+
+      <div class="card output" id="consOutputCard"></div>
+    </section>
+
+    <!-- ============ DEFINIÇÕES ============ -->
+    <section id="tab-definicoes" class="panel" role="tabpanel" hidden>
+      <div class="settings">
+        <div class="card">
+          <h2>Ditado</h2>
+          <label>Motor de reconhecimento
+            <select data-setting="dictEngine">
+              <option value="webspeech">Navegador (tempo real — Chrome/Edge)</option>
+              <option value="whisper">Whisper local (offline — transcreve ao parar)</option>
+            </select>
+          </label>
+          <p class="note">O reconhecimento do navegador é imediato, mas no Chrome/Edge o áudio pode ser processado nos servidores do fornecedor do navegador. Para garantir que nada sai do computador use <b>Whisper local</b>.</p>
+          <label>Idioma
+            <select data-setting="lang">
+              <option value="pt-PT">Português (Portugal)</option>
+              <option value="pt-BR">Português (Brasil)</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" data-setting="onDevice"> Pedir reconhecimento no dispositivo, se o navegador suportar</label>
+          <label class="check"><input type="checkbox" data-setting="autoPunct"> Terminar frase automaticamente nas pausas</label>
+          <label class="check"><input type="checkbox" data-setting="expandNormal"> Expandir «normal» / «sem alterações» para texto-padrão do exame</label>
+        </div>
+
+        <div class="card">
+          <h2>Transcrição de consultas</h2>
+          <label>Motor
+            <select data-setting="asrEngine">
+              <option value="browser">Whisper no navegador (sem instalação)</option>
+              <option value="server">Servidor Whisper local (compatível OpenAI)</option>
+            </select>
+          </label>
+          <label>Modelo Whisper (navegador)
+            <select data-setting="whisperModel">
+              <option value="onnx-community/whisper-base">base — rápido (~80 MB)</option>
+              <option value="onnx-community/whisper-small">small — equilibrado (~250 MB)</option>
+              <option value="onnx-community/whisper-large-v3-turbo">large-v3-turbo — melhor qualidade (~800 MB, requer GPU)</option>
+            </select>
+          </label>
+          <label>Processamento
+            <select data-setting="whisperDevice">
+              <option value="auto">Automático (GPU se disponível)</option>
+              <option value="webgpu">GPU (WebGPU)</option>
+              <option value="wasm">CPU (WASM)</option>
+            </select>
+          </label>
+          <label>URL do servidor Whisper local
+            <input type="url" data-setting="asrServerUrl" placeholder="http://localhost:8000/v1/audio/transcriptions">
+          </label>
+          <label>Modelo no servidor
+            <input type="text" data-setting="asrServerModel" placeholder="whisper-1">
+          </label>
+          <p class="note">O modelo do navegador é descarregado uma vez e guardado em cache; a partir daí a transcrição é feita inteiramente neste computador.</p>
+        </div>
+
+        <div class="card">
+          <h2>IA local (organização)</h2>
+          <label>Fornecedor
+            <select data-setting="llmProvider">
+              <option value="ollama">Ollama</option>
+              <option value="openai">Compatível OpenAI (LM Studio, llama.cpp, vLLM…)</option>
+            </select>
+          </label>
+          <label>Endereço
+            <input type="url" data-setting="llmUrl" placeholder="http://localhost:11434">
+          </label>
+          <label>Modelo
+            <input type="text" data-setting="llmModel" list="modelList" placeholder="qwen2.5:7b">
+            <datalist id="modelList"></datalist>
+          </label>
+          <label>Chave (opcional, só servidores compatíveis OpenAI)
+            <input type="password" data-setting="llmApiKey" autocomplete="off">
+          </label>
+          <label>Contexto (tokens)
+            <input type="number" data-setting="llmContext" min="2048" step="1024">
+          </label>
+          <div class="actions"><button id="llmTest" class="btn">Testar ligação</button><span id="llmTestResult" class="muted small"></span></div>
+          <p class="note">Recomendado: <code>ollama pull qwen2.5:7b</code> (bom em português). Para permitir pedidos desta página, inicie o Ollama com <code>OLLAMA_ORIGINS=*</code> ou o endereço desta página.</p>
+        </div>
+
+        <div class="card">
+          <h2>Texto para o SClinico</h2>
+          <label>Formato
+            <select data-setting="format">
+              <option value="orl">ORL detalhado (secções)</option>
+              <option value="soap">SOAP (S / O / A / P)</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" data-setting="upperHeadings"> Títulos em maiúsculas</label>
+          <label class="check"><input type="checkbox" data-setting="includeEmpty"> Incluir secções vazias</label>
+          <label class="check"><input type="checkbox" data-setting="keepDraft"> Manter rascunho se a página recarregar (apagado ao fechar o separador)</label>
+          <div class="actions"><button id="resetSettings" class="btn ghost">Repor predefinições</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><b>OtoDita</b> apoia a documentação clínica e não substitui o julgamento médico. Reveja sempre o texto antes de o registar no SClinico. Nenhum dado clínico é guardado ou enviado para a internet pela aplicação.</p>
+  </footer>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script>
+    if (location.protocol === 'file:') {
+      document.body.insertAdjacentHTML('afterbegin', '<div style="background:#C8323C;color:#fff;padding:12px 20px;text-align:center;font-weight:600">Abra o OtoDita com o script «iniciar» (iniciar.bat no Windows, iniciar.sh no Mac/Linux). Aberto diretamente do ficheiro, o microfone e a aplicação não funcionam.</div>');
+    }
+  </script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

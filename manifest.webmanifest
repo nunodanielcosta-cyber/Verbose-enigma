@@ -1,0 +1,11 @@
+{
+  "name": "OtoDita — Ditado clínico ORL",
+  "short_name": "OtoDita",
+  "description": "Ditado e registo de consultas de Otorrinolaringologia com IA local, pronto a copiar para o SClinico.",
+  "lang": "pt-PT",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F3F6F9",
+  "theme_color": "#0B4F7A",
+  "icons": [{ "src": "assets/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
