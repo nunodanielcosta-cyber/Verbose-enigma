@@ -28,16 +28,22 @@ const DEFAULTS = {
   llmModel: 'qwen2.5:7b',
   llmApiKey: '',
   llmContext: 8192,
-  format: 'orl',
+  format: 'soap',
   upperHeadings: true,
   includeEmpty: false,
   keepDraft: true,
+  version: 2,
 };
 const SETTINGS_KEY = 'otodita-settings';
 const DRAFT_KEY = 'otodita-draft';
 
 function loadSettings() {
-  try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; } catch { return { ...DEFAULTS }; }
+  try {
+    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    // v2: SOAP passa a ser o formato predefinido (aplica-se uma vez a definições antigas)
+    if ((saved.version || 1) < 2) { delete saved.format; saved.version = 2; }
+    return { ...DEFAULTS, ...saved };
+  } catch { return { ...DEFAULTS }; }
 }
 const settings = loadSettings();
 function saveSettings() {
@@ -172,8 +178,8 @@ class NoteEditor {
       <div class="out-head">
         <h2>${ICON_DOC}Texto para o SClinico</h2>
         <select class="fmt" aria-label="Formato">
-          <option value="orl">ORL detalhado</option>
           <option value="soap">SOAP (S/O/A/P)</option>
+          <option value="orl">ORL detalhado</option>
         </select>
         <span class="spacer"></span>
         <button class="btn primary copy-all">${ICON_COPY}Copiar tudo</button>

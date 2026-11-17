@@ -9,7 +9,7 @@ const clean = (t) => (t || '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n'
  * format 'soap' → quatro blocos S / O / A / P (campos separados do SClinico)
  */
 export function buildBlocks(note, opts = {}) {
-  const { format = 'orl', upperHeadings = true, includeEmpty = false } = opts;
+  const { format = 'soap', upperHeadings = true, includeEmpty = false } = opts;
   const H = (t) => (upperHeadings ? t.toLocaleUpperCase('pt-PT') : t);
   const has = (s) => includeEmpty || clean(note[s.id]);
   const val = (s) => clean(note[s.id]) || '—';

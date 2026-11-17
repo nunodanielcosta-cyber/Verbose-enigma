@@ -6,7 +6,7 @@ O **OtoDita** (*Oto* + *ditar*) é uma aplicação web local para a consulta de 
 
 - **Ditado:** dita em tempo real. O texto é organizado automaticamente nas secções do registo ORL (motivo, HDA, antecedentes, otoscopia, rinoscopia, orofaringe, laringoscopia, pescoço, acumetria/vestibular, MCDT, diagnóstico, plano, seguimento).
 - **Gravar consulta:** grava a consulta (com consentimento do doente). A transcrição é feita com **Whisper local** e a análise com **IA local** (Ollama / LM Studio), que separa queixas, achados, diagnóstico e plano.
-- **Texto para o SClinico:** em formato *ORL detalhado* ou *SOAP*. Pode copiar tudo de uma vez ou bloco a bloco (útil para os campos S/O/A/P).
+- **Texto para o SClinico:** em formato *SOAP* (predefinido) ou *ORL detalhado*. Pode copiar tudo de uma vez ou bloco a bloco (útil para os campos S/O/A/P).
 
 ## Privacidade
 
