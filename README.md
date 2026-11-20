@@ -1,35 +1,89 @@
 # 🥫 Despensa
 
-Web app simples para catalogar o que há na despensa (e frigorífico, congelador…).
+A despensa da família, sempre em dia: stock partilhado em tempo real, validades, lista de compras automática,
+leitor de códigos de barras, receitas com plano semanal e comparação de preços entre lojas.
 
-## Funcionalidades
-- Adicionar/editar produtos: nome, quantidade, unidade, categoria, local, validade, mínimo e notas
-- Botões **− / +** para atualizar a quantidade num toque
-- Pesquisa, filtros por categoria e local, ordenação por nome/validade/quantidade
-- Alertas de produtos fora de validade ou a expirar nos próximos 7 dias
-- **Lista de compras** automática: produtos esgotados ou abaixo do mínimo definido
-- Funciona offline e pode ser instalada no telemóvel ("Adicionar ao ecrã principal")
-- Exportar/Importar backup em JSON
+Sem build e sem frameworks: HTML, CSS e JavaScript simples. Os dados ficam no [Supabase](https://supabase.com) (grátis).
 
-## Como usar
-Não há dependências nem build. Basta abrir `index.html` no browser, ou servir a pasta:
+## O que faz
+
+| | |
+|---|---|
+| **Stock** | Alimentar, bebidas, limpeza, higiene, casa, animais, bebé… Mínimo e máximo por produto, local, validade, "aberto em" com validade depois de aberto. |
+| **Lista de compras** | Automática: quando um produto chega ao **mínimo**, entra na lista para comprar **até ao máximo**. Junta também o que falta para as **refeições planeadas** e itens adicionados à mão. Agrupa por corredor, por tipo ou pela loja mais barata. Um toque em ✓ e o produto entra no stock. |
+| **Leitor de códigos** | Câmara do telemóvel. Produto novo → preenche nome, marca, foto e tamanho a partir do Open Food Facts (e bases irmãs para limpeza/higiene). Modo "Arrumar compras" (com escolha rápida de validade) e modo "Gastar". Modo contínuo para ler vários seguidos. |
+| **Validade** | Escolha rápida (+1 semana, +1 mês…), leitura da data com a câmara (OCR) e leitura automática quando o código é GS1 DataMatrix com validade. |
+| **Preços** | Edge Function que procura cada produto no **Continente, Pingo Doce, Auchan e Mercadona**: o **mesmo produto** e o **mais barato da categoria** (por kg/L). Mostra o total por loja e a melhor combinação. Lidl: preços manuais ou pelo talão. |
+| **Receitas e plano** | Receitas com ingredientes ligados ao stock, plano semanal (almoço/jantar), "Cozinhei" desconta o stock, sugestões para **usar primeiro** o que está a expirar. |
+| **Família** | Cada pessoa entra com o seu email; código de convite; histórico de quem fez o quê; alterações aparecem na hora em todos os telemóveis. |
+| **Extras** | Comandos de voz ("gastei dois iogurtes", "falta lixívia"), leitura de talões, notificações, gastos por mês e por tipo, desperdício, sugestão de mínimo/máximo pelo consumo, modo escuro, funciona offline e instala-se como app. |
+
+## Experimentar já
+
+Abre a app e escolhe **"Experimentar com dados de exemplo"**: tudo funciona com dados de exemplo guardados só no browser
+(exceto a procura automática de preços, que precisa do Supabase).
 
 ```sh
-python3 -m http.server 8000   # depois abrir http://localhost:8000
+npm start            # ou: python3 -m http.server 8000  → http://localhost:8000
 ```
 
-### Publicar grátis no GitHub Pages
-Settings → Pages → *Deploy from a branch* → escolher o branch e a pasta `/ (root)`.
+## Pôr a funcionar para a família (≈ 15 minutos)
 
-## Onde ficam os dados
-No `localStorage` do browser, em cada dispositivo. Por isso:
-- Dispositivos diferentes têm dados diferentes — usa **Exportar/Importar** para passar dados de um para o outro.
-- Faz backup de vez em quando (limpar os dados do site apaga a despensa).
+### 1. Criar a base de dados
+1. Cria uma conta em [supabase.com](https://supabase.com) → **New project** (região: *West EU*).
+2. **SQL Editor → New query**, cola o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) e carrega em **Run**.
+3. **Authentication → Sign In / Providers → Email**: confirma que está ativo.
+4. **Authentication → Emails → Magic Link**: acrescenta o código ao email, para se poder entrar escrevendo o código
+   (útil no iPhone, onde a app instalada não abre links):
+   ```html
+   <h2>Código de acesso à Despensa: {{ .Token }}</h2>
+   <p><a href="{{ .ConfirmationURL }}">Ou carrega aqui para entrar</a></p>
+   ```
+
+### 2. Publicar a app (GitHub Pages)
+1. No GitHub: **Settings → Pages → Deploy from a branch** → escolhe o branch e a pasta `/ (root)`.
+2. Fica disponível em `https://<utilizador>.github.io/<repositório>/`.
+3. No Supabase: **Authentication → URL Configuration** → em *Site URL* e *Redirect URLs* coloca esse endereço.
+
+### 3. Ligar a app ao Supabase
+Em **Project Settings → API** copia o *Project URL* e a *anon public key* para [`js/config.js`](js/config.js).
+(A chave anon é pública por natureza; a segurança vem das regras do `schema.sql`: cada casa só vê os seus dados.)
+
+### 4. Ativar a comparação de preços
+```sh
+npx supabase login
+npx supabase functions deploy precos --project-ref <REF do projeto>
+```
+Opcional: `npx supabase secrets set MERCADONA_WH=<armazém>` para usar os preços da tua zona na Mercadona.
+
+### 5. Convidar a família
+Na app: **Mais → Família → Convidar**. Cada pessoa abre o link, entra com o seu email e escolhe
+"Juntar-me à família" com o código. No telemóvel: menu do browser → **Adicionar ao ecrã principal**.
+
+## ⚠️ Sobre a comparação de preços
+As lojas não têm API pública: a função lê as páginas de pesquisa dos sites (uso pessoal, com cache de 6 h e poucos pedidos de cada vez).
+- Os leitores foram escritos com base na estrutura conhecida dos sites, mas **não puderam ser testados contra os sites reais**
+  durante o desenvolvimento. Se uma loja não devolver resultados, a app avisa ("Sem resposta de: …") e as outras continuam a funcionar.
+- Para corrigir uma loja, normalmente basta ajustar o URL ou os seletores em
+  [`supabase/functions/precos/stores.js`](supabase/functions/precos/stores.js) (`SFCC_SELECTORS`).
+- Os termos de uso dos sites podem não permitir leitura automática; usa com moderação.
+- Preços online podem diferir da loja física. A Lidl não tem loja online de alimentação.
 
 ## Estrutura
-| Ficheiro | Para quê |
-|---|---|
-| `index.html` | Estrutura da página e formulário |
-| `style.css` | Aspeto (inclui modo escuro) |
-| `app.js` | Toda a lógica (~250 linhas, comentada) |
-| `sw.js`, `manifest.webmanifest`, `icon.svg` | Modo offline e instalação como app |
+
+```
+index.html, css/app.css      página e visual (cores em variáveis no topo do CSS)
+js/config.js                 ligação ao Supabase
+js/domain.js                 regras: lista de compras, validades, receitas, voz, talões (sem interface, testado)
+js/store.js                  dados em memória + sincronização (Supabase em tempo real ou modo demonstração)
+js/auth.js                   entrar, criar casa, juntar-se com código
+js/views/*.js                ecrãs: início, stock, produto, lista, preços, receitas, mais
+js/scanner.js, ocr.js        câmara: códigos de barras, datas e talões
+js/voice.js, notify.js       voz e notificações
+supabase/schema.sql          tabelas e regras de segurança
+supabase/functions/precos/   procura de preços nas lojas (lib.js = lógica testada, stores.js = um leitor por loja)
+tests/                       npm install && npm test
+```
+
+Bibliotecas carregadas do CDN só quando são precisas: `@supabase/supabase-js`, `barcode-detector` (quando o browser
+não tem leitor nativo, ex.: iPhone) e `tesseract.js` (OCR).

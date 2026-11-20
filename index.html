@@ -2,81 +2,23 @@
 <html lang="pt">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Despensa</title>
-  <meta name="theme-color" content="#2f7d4f">
+  <meta name="description" content="A despensa da família: stock, validades, lista de compras, receitas e preços.">
+  <meta name="theme-color" content="#0f9f6e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-  <header>
-    <h1>🥫 Despensa</h1>
-    <nav class="tabs">
-      <button data-view="stock" class="active">Stock</button>
-      <button data-view="shopping">Compras <span id="shopCount" class="badge" hidden></span></button>
-    </nav>
-  </header>
-
-  <main>
-    <section id="toolbar">
-      <input id="search" type="search" placeholder="Procurar…" autocomplete="off">
-      <select id="filterCategory"><option value="">Categoria: todas</option></select>
-      <select id="filterLocation"><option value="">Local: todos</option></select>
-      <select id="sort">
-        <option value="name">Ordenar: nome</option>
-        <option value="expiry">Validade</option>
-        <option value="qty">Quantidade</option>
-        <option value="updated">Recentes</option>
-      </select>
-    </section>
-
-    <p id="alerts" hidden></p>
-    <ul id="list"></ul>
-    <p id="empty" hidden>Nada por aqui. Toca em <strong>+</strong> para adicionar.</p>
-  </main>
-
-  <button id="addBtn" class="fab" aria-label="Adicionar produto">+</button>
-
-  <footer>
-    <button id="exportBtn" class="link">Exportar backup</button> ·
-    <label class="link">Importar<input id="importFile" type="file" accept="application/json" hidden></label>
-  </footer>
-
-  <dialog id="itemDialog">
-    <form id="itemForm" method="dialog">
-      <h2 id="dialogTitle">Novo produto</h2>
-      <input type="hidden" name="id">
-      <label>Nome <input name="name" required list="nameList" autocomplete="off"></label>
-      <div class="row">
-        <label>Quantidade <input name="qty" type="number" min="0" step="any" value="1" required></label>
-        <label>Unidade <input name="unit" list="unitList" placeholder="un"></label>
-      </div>
-      <div class="row">
-        <label>Categoria <input name="category" list="categoryList" placeholder="Mercearia"></label>
-        <label>Local <input name="location" list="locationList" placeholder="Despensa"></label>
-      </div>
-      <div class="row">
-        <label>Validade <input name="expiry" type="date"></label>
-        <label>Mínimo <input name="min" type="number" min="0" step="any" placeholder="0"
-               title="Quando a quantidade fica igual ou abaixo, vai para a lista de compras"></label>
-      </div>
-      <label>Notas <input name="notes" autocomplete="off"></label>
-      <menu>
-        <button type="button" id="deleteBtn" class="danger">Apagar</button>
-        <span class="spacer"></span>
-        <button value="cancel" formnovalidate>Cancelar</button>
-        <button value="save" class="primary">Guardar</button>
-      </menu>
-    </form>
-  </dialog>
-
-  <datalist id="nameList"></datalist>
-  <datalist id="categoryList"></datalist>
-  <datalist id="locationList"></datalist>
-  <datalist id="unitList"></datalist>
-
-  <script src="app.js"></script>
+  <div id="app"><div class="loading"><div class="spinner"></div></div></div>
+  <div id="toasts" aria-live="polite"></div>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

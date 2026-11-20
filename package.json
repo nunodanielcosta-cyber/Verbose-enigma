@@ -1,0 +1,13 @@
+{
+  "name": "despensa",
+  "private": true,
+  "type": "module",
+  "description": "A despensa da família. A app não precisa de build: este ficheiro serve só para correr os testes.",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "linkedom": "0.18.14"
+  }
+}
