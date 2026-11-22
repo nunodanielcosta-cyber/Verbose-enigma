@@ -54,13 +54,14 @@ function shell() {
   els.nav = h('nav', { class: 'tabbar' }, NAV.map(([id, label, ic]) => id === 'scan'
     ? h('button', { class: 'tab-scan', 'aria-label': 'Ler código de barras', onclick: () => openScanner() }, icon('scan', 26))
     : h('a', { href: '#/' + id, class: 'tab', 'data-id': id }, icon(ic, 22), h('span', {}, label), id === 'shopping' && h('b', { class: 'badge', hidden: true }))));
-  root.replaceChildren(
+  root.replaceChildren(...[
     h('header', { class: 'topbar' },
       h('div', { class: 'grow' }, els.title, els.sub),
       voiceSupported() && h('button', { class: 'icon-btn', 'aria-label': 'Comando de voz', onclick: listen }, icon('mic')),
       h('a', { class: 'avatar', href: '#/more', 'aria-label': 'Mais' }, (store.ctx.userName || '?')[0].toUpperCase())),
     store.ctx.mode === 'demo' && h('div', { class: 'demo-banner' }, icon('sparkles', 16), 'Modo demonstração — dados de exemplo só neste browser'),
-    els.view, els.fab, els.nav);
+    els.view, els.fab, els.nav,
+  ].filter(Boolean)); // sem isto, a faixa ausente aparecia escrita como "false"
   updateBadge();
 }
 
