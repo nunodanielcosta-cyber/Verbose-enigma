@@ -12,31 +12,101 @@ const HEADERS = {
   'Accept-Language': 'pt-PT,pt;q=0.9',
 };
 
+// URLs de pesquisa. "grid" devolve só a grelha de produtos; "page" é a página de pesquisa normal (alternativa).
+export const SFCC_SITES = {
+  continente: {
+    origin: 'https://www.continente.pt',
+    grid: 'https://www.continente.pt/on/demandware.store/Sites-continente-Site/default/Search-UpdateGrid?q={q}&start=0&sz=24',
+    page: 'https://www.continente.pt/pesquisa/?q={q}',
+  },
+  pingodoce: {
+    origin: 'https://www.pingodoce.pt',
+    grid: 'https://www.pingodoce.pt/on/demandware.store/Sites-pingo-doce-Site/default/Search-UpdateGrid?q={q}&start=0&sz=24',
+    page: 'https://www.pingodoce.pt/pesquisa/?q={q}',
+  },
+  auchan: {
+    origin: 'https://www.auchan.pt',
+    grid: 'https://www.auchan.pt/on/demandware.store/Sites-AuchanPT-Site/pt_PT/Search-UpdateGrid?q={q}&start=0&sz=24',
+    page: 'https://www.auchan.pt/pt/pesquisa?q={q}',
+  },
+};
+
+/** Devolve { search: { loja: (q) => resultados }, diagnose(loja, q) }. */
 export function createStores({ fetch, parseHTML, env = {} }) {
-  const getText = async (url) => {
-    const r = await fetch(url, { headers: { ...HEADERS, Accept: 'text/html,*/*' } });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.text();
+  const get = async (url, accept) => {
+    const r = await fetch(url, { headers: { ...HEADERS, Accept: accept } });
+    return { status: r.status, ok: r.ok, text: await r.text(), finalUrl: r.url || url };
   };
   const getJSON = async (url) => {
-    const r = await fetch(url, { headers: { ...HEADERS, Accept: 'application/json' } });
+    const r = await get(url, 'application/json');
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
+    return JSON.parse(r.text);
+  };
+  const fill = (tpl, q) => tpl.replace('{q}', encodeURIComponent(q));
+
+  // Continente, Pingo Doce e Auchan usam a mesma plataforma (Salesforce Commerce Cloud).
+  // Tenta a grelha; se falhar ou vier vazia, tenta a página de pesquisa normal.
+  const sfcc = (site) => async (q) => {
+    let lastError = null;
+    for (const tpl of [site.grid, site.page]) {
+      try {
+        const r = await get(fill(tpl, q), 'text/html,*/*');
+        if (!r.ok) { lastError = new Error(`HTTP ${r.status}`); continue; }
+        const out = parseSfccGrid(parseHTML(r.text).document, site.origin);
+        if (out.length) return out;
+      } catch (e) { lastError = e; }
+    }
+    if (lastError) throw lastError;
+    return [];
   };
 
-  // Continente, Pingo Doce e Auchan usam a mesma plataforma (Salesforce Commerce Cloud),
-  // que tem um URL de pesquisa que devolve só a grelha de produtos.
-  const sfcc = (gridUrl, origin) => async (q) => {
-    const url = `${gridUrl}?q=${encodeURIComponent(q)}&start=0&sz=24`;
-    return parseSfccGrid(parseHTML(await getText(url)).document, origin);
-  };
-
-  return {
-    continente: sfcc('https://www.continente.pt/on/demandware.store/Sites-continente-Site/default/Search-UpdateGrid', 'https://www.continente.pt'),
-    pingodoce: sfcc('https://www.pingodoce.pt/on/demandware.store/Sites-pingo-doce-Site/default/Search-UpdateGrid', 'https://www.pingodoce.pt'),
-    auchan: sfcc('https://www.auchan.pt/on/demandware.store/Sites-AuchanPT-Site/pt_PT/Search-UpdateGrid', 'https://www.auchan.pt'),
+  const search = {
+    continente: sfcc(SFCC_SITES.continente),
+    pingodoce: sfcc(SFCC_SITES.pingodoce),
+    auchan: sfcc(SFCC_SITES.auchan),
     mercadona: mercadona({ getJSON, env }),
   };
+
+  /** Mostra o que a loja devolve de facto (para acertar os seletores quando um site muda). */
+  async function diagnose(store, q) {
+    if (store === 'mercadona') {
+      const out = { store };
+      try {
+        const root = await getJSON(`https://tienda.mercadona.pt/api/categories/?lang=pt`);
+        const ids = (root.results || []).flatMap((c) => (c.categories || []).map((x) => x.id));
+        out.categories = ids.length;
+        if (ids.length) {
+          const cat = await getJSON(`https://tienda.mercadona.pt/api/categories/${ids[0]}/?lang=pt`);
+          const prod = cat.categories?.[0]?.products?.[0];
+          out.sampleRaw = prod ? JSON.stringify(prod).slice(0, 1200) : JSON.stringify(cat).slice(0, 1200);
+          out.sampleParsed = prod ? mapMercadona(prod) : null;
+        }
+        out.results = (await search.mercadona(q)).slice(0, 3);
+      } catch (e) { out.error = String(e.message || e); }
+      return out;
+    }
+    const site = SFCC_SITES[store];
+    const attempts = [];
+    for (const tpl of [site.grid, site.page]) {
+      const url = fill(tpl, q);
+      try {
+        const r = await get(url, 'text/html,*/*');
+        const doc = parseHTML(r.text).document;
+        const parsed = r.ok ? parseSfccGrid(doc, site.origin) : [];
+        const i = r.text.indexOf('data-pid');
+        attempts.push({
+          url, status: r.status, finalUrl: r.finalUrl, bytes: r.text.length,
+          title: doc.querySelector('title')?.textContent?.trim() || null,
+          tilesWithDataPid: doc.querySelectorAll('[data-pid]').length,
+          parsed: parsed.length, first: parsed.slice(0, 2),
+          snippet: (i >= 0 ? r.text.slice(Math.max(0, i - 300), i + 2200) : r.text.slice(0, 1500)).replace(/\s+/g, ' '),
+        });
+      } catch (e) { attempts.push({ url, error: String(e.message || e) }); }
+    }
+    return { store, attempts };
+  }
+
+  return { search, diagnose };
 }
 
 // ---------- Salesforce Commerce Cloud (Continente, Pingo Doce, Auchan) ----------

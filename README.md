@@ -50,6 +50,14 @@ Em **Project Settings → API** copia o *Project URL* e a *anon public key* para
 (A chave anon é pública por natureza; a segurança vem das regras do `schema.sql`: cada casa só vê os seus dados.)
 
 ### 4. Ativar a comparação de preços
+**Pelo painel (sem instalar nada):** Edge Functions → *Deploy a new function* → *Via Editor* → nome `precos` →
+apaga o código de exemplo e cola o conteúdo de [`supabase/precos-um-ficheiro.ts`](supabase/precos-um-ficheiro.ts) → *Deploy*.
+(Esse ficheiro é gerado com `npm run bundle` a partir de `supabase/functions/precos/`.)
+
+**Diagnóstico das lojas:** na função, botão *Test* com o corpo
+`{"diagnose": true, "q": "leite meio gordo"}` — mostra o que cada loja devolve, útil para acertar os leitores.
+
+**Ou pela linha de comandos:**
 ```sh
 npx supabase login
 npx supabase functions deploy precos --project-ref <REF do projeto>

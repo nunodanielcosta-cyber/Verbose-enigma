@@ -17,7 +17,10 @@ const CORS = {
 type Item = { id: string; name: string; brand?: string | null; size?: string | null; compare_as?: string | null; category?: string | null };
 type Offer = Record<string, unknown> & { name: string; price: number };
 
-const stores = createStores({ fetch, parseHTML, env: { MERCADONA_WH: Deno.env.get('MERCADONA_WH') ?? '' } }) as Record<string, (q: string) => Promise<Offer[]>>;
+const { search: stores, diagnose } = createStores({ fetch, parseHTML, env: { MERCADONA_WH: Deno.env.get('MERCADONA_WH') ?? '' } }) as {
+  search: Record<string, (q: string) => Promise<Offer[]>>;
+  diagnose: (store: string, q: string) => Promise<unknown>;
+};
 
 // Cache de pesquisas (6 h) para não repetir pedidos às lojas.
 const cache = new Map<string, { at: number; value: Promise<Offer[]> }>();
@@ -41,6 +44,15 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   try {
     const body = await req.json();
+
+    // Diagnóstico: { "diagnose": true, "q": "leite meio gordo", "stores": ["continente"] }
+    // Mostra o que cada loja devolve, para acertar os leitores quando um site muda.
+    if (body.diagnose) {
+      const q = body.q || 'leite meio gordo';
+      const which: string[] = (body.stores || Object.keys(stores)).filter((s: string) => s in stores);
+      const report = await Promise.all(which.map((s) => diagnose(s, q).catch((e) => ({ store: s, error: String(e) }))));
+      return new Response(JSON.stringify({ q, report }, null, 2), { headers: { ...CORS, 'Content-Type': 'application/json' } });
+    }
     const items: Item[] = (body.items || []).slice(0, 60);
     const wanted: string[] = (body.stores || Object.keys(stores)).filter((s: string) => s in stores);
 
