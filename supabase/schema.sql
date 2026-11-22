@@ -148,6 +148,15 @@ create table if not exists public.events (
 );
 create index if not exists events_household_at on public.events(household_id, at desc);
 
+-- ---------- Autorizações base ----------
+-- Só utilizadores com sessão iniciada (authenticated) podem usar as tabelas; as regras abaixo (RLS)
+-- limitam depois cada pessoa aos dados da sua casa. Visitantes sem sessão (anon) não têm acesso.
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+revoke all on all tables in schema public from anon;
+grant execute on function public.is_member(uuid), public.create_household(text, text), public.join_household(text, text) to authenticated;
+revoke execute on function public.create_household(text, text), public.join_household(text, text) from anon, public;
+
 -- ---------- Segurança: cada casa só vê os seus dados ----------
 alter table public.households enable row level security;
 alter table public.members    enable row level security;
