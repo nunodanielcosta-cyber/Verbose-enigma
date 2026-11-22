@@ -1,9 +1,10 @@
 // Lista de compras: gerada a partir do stock (mín./máx.), do plano de refeições e de itens manuais.
 import { h, icon, sheet, field, toast, fmtQty, fmtMoney, empty, prefs, stepper } from '../ui.js';
 import { store } from '../store.js';
-import { shoppingList, STORES, storeOf, latestPrices, packsFor, bestMatch, groupOf, parseReceipt, todayISO, addDays, convertToProduct } from '../domain.js';
+import { shoppingList, STORES, storeOf, latestPrices, packsFor, bestMatch, groupOf, todayISO, addDays } from '../domain.js';
 import { thumb, restock, openProduct } from './product.js';
 import { openCompare } from './prices.js';
+import { receiptFlow } from './receipt.js';
 
 export function currentList() {
   return shoppingList({
@@ -182,53 +183,5 @@ function buySheet(it) {
             toast(`✓ ${it.name} comprado e arrumado`);
           },
         }, icon('check', 18), 'Comprado')));
-  });
-}
-
-// ---------- Talão ----------
-export async function receiptFlow() {
-  const { pickImage, recognizeReceipt } = await import('../ocr.js');
-  const file = await pickImage();
-  if (!file) return;
-  const status = h('p', { class: 'muted' }, 'A preparar…');
-  const s = sheet('Ler talão', h('div', { class: 'stack' }, status, h('div', { class: 'spinner' })));
-  let lines;
-  try {
-    const text = await recognizeReceipt(file, (m) => { status.textContent = m; });
-    lines = parseReceipt(text);
-  } catch (e) {
-    status.textContent = 'Não foi possível ler: ' + e.message;
-    return;
-  }
-  s.close();
-  if (!lines.length) return toast('Não encontrei produtos no talão. Tenta uma foto mais nítida e direita.', { type: 'error' });
-
-  const products = store.all('products');
-  const rows = lines.map((l) => ({ ...l, product: bestMatch(l.name, products, 0.4)?.product || null, use: true }));
-  sheet('Confirmar talão', (close) => {
-    const st = h('select', { value: prefs.get('shop.store', '') }, h('option', { value: '' }, 'Loja…'), STORES.map((x) => h('option', { value: x.id }, x.label)));
-    const opts = [h('option', { value: '' }, '— ignorar —'), ...products.map((p) => h('option', { value: p.id }, p.name))];
-    return h('div', { class: 'stack' },
-      h('p', { class: 'muted small' }, 'Confirma a que produto corresponde cada linha. Os preços ficam registados e o stock é atualizado.'),
-      field('Loja', st),
-      h('div', { class: 'card list' }, rows.map((r) => h('div', { class: 'rrow' },
-        h('div', { class: 'grow' }, h('div', { class: 'mono small' }, r.name), h('div', { class: 'strong' }, fmtMoney(r.price), r.qty > 1 ? ` · ${r.qty}×` : '')),
-        h('select', { value: r.product?.id || '', onchange: (e) => { r.product = store.get('products', e.target.value) || null; } }, opts.map((o) => o.cloneNode(true)))))),
-      h('button', {
-        class: 'btn primary block', onclick: () => {
-          let n = 0;
-          for (const r of rows) {
-            if (!r.product) continue;
-            // 1 linha do talão = 1 embalagem; converte para a unidade do produto (ex.: 1 pacote de 500 g = 0,5 kg)
-            const p = r.product;
-            const add = p.package_size && p.package_unit ? convertToProduct(p.package_size * r.qty, p.package_unit, p) : r.qty;
-            restock(r.product, add, null, 'buy', { price: r.price, store: st.value || null });
-            if (st.value) store.insert('prices', { product_id: r.product.id, item_name: r.product.name, store: st.value, kind: 'receipt', name: r.name, price: +(r.price / r.qty).toFixed(2) });
-            n++;
-          }
-          close();
-          toast(`${n} produtos atualizados a partir do talão`);
-        },
-      }, icon('check', 18), 'Aplicar'));
   });
 }

@@ -70,7 +70,7 @@ test('códigos GS1 com validade', () => {
 
 test('talão', () => {
   const lines = parseReceipt(`CONTINENTE\nLEITE MIMOSA M/G 1L      0,95\n2 x IOG NAT DANONE      1,58\nSUBTOTAL 2,53\nTOTAL   2,53\nMULTIBANCO 2,53`);
-  assert.deepEqual(lines, [{ name: 'LEITE MIMOSA M/G 1L', qty: 1, price: 0.95 }, { name: 'IOG NAT DANONE', qty: 2, price: 1.58 }]);
+  assert.deepEqual(lines, [{ name: 'LEITE MIMOSA M/G 1L', qty: 1, price: 0.95, kg: null }, { name: 'IOG NAT DANONE', qty: 2, price: 1.58, kg: null }]);
   const m = bestMatch('LEITE MIMOSA M/G 1L', [{ name: 'Leite meio-gordo', brand: 'Mimosa' }, { name: 'Leite de coco' }], 0.4);
   assert.equal(m.product.name, 'Leite meio-gordo');
 });
@@ -84,4 +84,40 @@ test('estado da receita e sugestão de mín./máx.', () => {
   const s = suggestMinMax(events, 'Leite', now);
   assert.ok(s.perWeek > 2 && s.perWeek < 4);
   assert.ok(s.max > s.min);
+});
+
+test('talão com pesos e quantidades em linhas separadas', () => {
+  const lines = parseReceipt(`BANANA 0,856 kg x 1,29 1,10
+MACA GALA                 1,52
+   0,894 kg x 1,70 EUR/kg
+AGUA LUSO 1,5L            1,78
+   2 X 0,89
+POLPA TOMATE GULOSO       0,79
+DESCONTO IMEDIATO        -0,20
+TOTAL                     5,19`);
+  assert.deepEqual(lines, [
+    { name: 'BANANA', qty: 1, price: 1.1, kg: 0.856 },
+    { name: 'MACA GALA', qty: 1, price: 1.52, kg: 0.894 },
+    { name: 'AGUA LUSO 1,5L', qty: 2, price: 1.78, kg: null },
+    { name: 'POLPA TOMATE GULOSO', qty: 1, price: 0.79, kg: null },
+  ]);
+});
+
+test('fruta e legumes: reconhecer no talão e converter peso em unidades', async () => {
+  const { matchProduce, unitsFromKg, productFromCatalog } = await import('../js/produce.js');
+  assert.equal(matchProduce('MACA GALA').name, 'Maçã');
+  assert.equal(matchProduce('BANAN CAT I').name, 'Banana');
+  assert.equal(matchProduce('BATATA DOCE KG').name, 'Batata-doce');
+  assert.equal(matchProduce('POLPA TOMATE GULOSO'), null);
+  assert.equal(matchProduce('MACARRAO'), null);
+  assert.equal(matchProduce('SUMO LARANJA 1L'), null);
+  const banana = productFromCatalog(matchProduce('banana'));
+  assert.equal(unitsFromKg(0.856, banana), 5);
+  assert.equal(unitsFromKg(2.3, { unit: 'kg' }), 2.3);
+});
+
+test('frescos avisam só no fim', () => {
+  const today = new Date().toISOString().slice(0, 10);
+  assert.equal(expiryStatus({ qty: 3, shelf_days: 5, expiry: addDays(today, 5) }, 5).level, 'ok');
+  assert.equal(expiryStatus({ qty: 3, shelf_days: 5, expiry: addDays(today, 2) }, 5).level, 'soon');
 });

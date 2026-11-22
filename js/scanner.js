@@ -4,6 +4,7 @@ import { h, icon, sheet, toast, prefs } from './ui.js';
 import { store } from './store.js';
 import { parseGS1, groupOf } from './domain.js';
 import { openProductForm, askQtyExpiry, restock, thumb } from './views/product.js';
+import { openFresh } from './views/fresh.js';
 
 const PONYFILL = 'https://cdn.jsdelivr.net/npm/barcode-detector@3.2.3/dist/es/ponyfill.js/+esm';
 const FORMATS = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'data_matrix', 'qr_code'];
@@ -113,6 +114,7 @@ export function openScanner({ mode: initialMode } = {}) {
       h('label', { class: 'switch' },
         h('input', { type: 'checkbox', checked: continuous, onchange: (e) => { continuous = e.target.checked; prefs.set('scanContinuous', continuous); } }),
         h('span', {}, 'Modo contínuo (ler vários seguidos)')),
+      h('button', { type: 'button', class: 'btn soft block', onclick: () => { close(); openFresh(); } }, '🥕 Sem código? Frutas e legumes'),
       h('form', { class: 'row', onsubmit: (e) => { e.preventDefault(); if (manual.value.trim()) handle(manual.value.trim()); manual.value = ''; } },
         manual, h('button', { class: 'btn' }, 'OK')),
       recent);

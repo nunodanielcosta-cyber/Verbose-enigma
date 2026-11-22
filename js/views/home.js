@@ -6,6 +6,7 @@ import { productRow, warnDays, eventRow, openProductForm } from './product.js';
 import { openRecipe } from './recipes.js';
 import { currentList } from './shopping.js';
 import { openScanner } from '../scanner.js';
+import { openFresh } from './fresh.js';
 
 export default {
   id: 'home',
@@ -36,6 +37,7 @@ export default {
           empty('🧺', 'Vamos encher a despensa', 'Começa por ler os códigos de barras do que tens em casa. Também podes adicionar à mão.',
             h('div', { class: 'row center' },
               h('button', { class: 'btn primary', onclick: () => openScanner({ mode: 'add' }) }, icon('scan', 18), 'Ler códigos'),
+              h('button', { class: 'btn soft', onclick: () => openFresh() }, '🥕 Fruta e legumes'),
               h('button', { class: 'btn soft', onclick: () => openProductForm() }, icon('plus', 18), 'À mão'))));
       }
 

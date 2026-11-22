@@ -2,7 +2,7 @@
 import { h, icon, field, toast, fmtMoney, fmtQty, prefs, confirmSheet, sheet } from '../ui.js';
 import { store } from '../store.js';
 import { groupOf, STORES } from '../domain.js';
-import { receiptFlow } from './shopping.js';
+import { receiptFlow } from './receipt.js';
 import { enableNotifications } from '../notify.js';
 
 export default {

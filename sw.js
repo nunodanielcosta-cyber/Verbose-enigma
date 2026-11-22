@@ -1,12 +1,13 @@
 // Service worker: permite abrir a app sem rede e mostrar notificações.
 // "Network first": usa sempre a versão mais recente quando há rede, por isso não é preciso mexer aqui ao atualizar.
-const CACHE = 'despensa-v2';
+const CACHE = 'despensa-v3';
 const FILES = [
   './', 'index.html', 'css/app.css', 'manifest.webmanifest', 'icon.svg',
   'js/main.js', 'js/ui.js', 'js/store.js', 'js/domain.js', 'js/auth.js', 'js/config.js', 'js/demo-data.js',
   'js/scanner.js', 'js/ocr.js', 'js/voice.js', 'js/notify.js',
   'js/views/home.js', 'js/views/stock.js', 'js/views/product.js', 'js/views/shopping.js',
   'js/views/prices.js', 'js/views/recipes.js', 'js/views/more.js',
+  'js/produce.js', 'js/views/fresh.js', 'js/views/receipt.js',
 ];
 
 self.addEventListener('install', (e) => {

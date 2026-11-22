@@ -517,3 +517,31 @@ dialog.sheet::backdrop { background: rgb(5 15 10 / .45); backdrop-filter: blur(2
 .sheet-body > * { min-width: 0; }
 .cmp-row .grow, .price-row .grow, .srow .grow { min-width: 0; }
 .offer { overflow-wrap: anywhere; }
+
+/* ---------- Frutas e legumes ---------- */
+.fresh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.fresh {
+  position: relative; display: grid; justify-items: center; gap: 2px; padding: 12px 6px 10px;
+  border: 1.5px solid var(--border); border-radius: 18px; background: var(--surface); color: var(--text);
+  font: inherit; cursor: pointer; opacity: .55; transition: transform .1s, opacity .15s;
+  -webkit-user-select: none; user-select: none;
+}
+.fresh:active { transform: scale(.93); }
+.fresh.has { opacity: 1; border-color: color-mix(in srgb, var(--primary) 45%, var(--border)); background: var(--primary-soft); }
+.fresh.soon { border-color: var(--warn); }
+.fresh.past { border-color: var(--danger); }
+.fresh-emoji { font-size: 32px; line-height: 1.1; }
+.fresh-name { font-size: 12px; font-weight: 700; text-align: center; line-height: 1.2; }
+.fresh-qty {
+  position: absolute; top: 6px; right: 6px; min-width: 22px; padding: 1px 6px; border-radius: 11px;
+  background: var(--primary); color: var(--on-primary); font-size: 11.5px; font-weight: 800;
+}
+.fresh-warn { position: absolute; top: 6px; left: 8px; font-size: 13px; }
+
+/* ---------- Talão ---------- */
+.rrow { align-items: flex-start; }
+.rrow .grow { display: grid; gap: 4px; }
+.rrow select { width: 100%; padding: 8px; font-size: 13px; }
+.rrow.off { opacity: .55; }
+.rrow-qty { display: grid; gap: 2px; justify-items: center; width: 74px; flex-shrink: 0; }
+.rrow-qty input { padding: 8px; text-align: center; }

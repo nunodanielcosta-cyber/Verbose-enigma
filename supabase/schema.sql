@@ -72,11 +72,16 @@ create table if not exists public.products (
   expiry       date,
   opened_at    date,
   open_days    int,                                  -- dura X dias depois de aberto
+  shelf_days   int,                                  -- dura X dias depois de comprado (fruta, legumes…)
+  unit_kg      numeric,                              -- peso médio de 1 unidade (converte o peso do talão em unidades)
   notes        text,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now(),
   updated_by   uuid default auth.uid()
 );
+-- colunas acrescentadas depois da primeira versão (para bases de dados já criadas)
+alter table public.products add column if not exists shelf_days int;
+alter table public.products add column if not exists unit_kg numeric;
 create index if not exists products_household_barcode on public.products(household_id, barcode);
 
 create table if not exists public.shopping_items (

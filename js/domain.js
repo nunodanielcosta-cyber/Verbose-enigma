@@ -52,6 +52,8 @@ export function effectiveExpiry(p) {
 
 export function expiryStatus(p, warnDays = 5) {
   if (!(p.qty > 0)) return null;
+  // frescos que duram poucos dias (ex.: bananas, 5 dias) só avisam no último terço, senão estariam sempre "a expirar"
+  if (p.shelf_days && !p.opened_at) warnDays = Math.min(warnDays, Math.max(1, Math.round(p.shelf_days / 3)));
   const d = daysUntil(effectiveExpiry(p));
   if (d === null) return null;
   if (d < 0) return { level: 'past', days: d, text: d === -1 ? 'Expirou ontem' : `Expirou há ${-d} dias` };
@@ -358,21 +360,43 @@ export function parseGS1(raw) {
 }
 
 // ---------- Talões ----------
-/** Extrai linhas "PRODUTO ... 1,99" de um talão lido por OCR. */
+/**
+ * Extrai os produtos de um talão lido por OCR. Entende:
+ *   "LEITE MIMOSA M/G 1L      0,95"
+ *   "2 x IOG NAT DANONE      1,58"           (quantidade antes do nome)
+ *   "BANANA 0,856 kg x 1,29  1,10"           (peso na mesma linha)
+ *   "BANANA                  1,10"  +  "  0,856 kg x 1,29 €/kg"   (peso na linha seguinte)
+ *   "AGUA LUSO 1,5L          1,78"  +  "  2 X 0,89"                (quantidade na linha seguinte)
+ * Devolve [{ name, qty, price, kg }] — price é o total da linha.
+ */
 export function parseReceipt(text) {
-  const skip = /total|subtotal|iva|troco|multibanco|visa|mb way|desconto|cart[aã]o|poupan|saldo|nif|contribuinte|fatura|data|hora|obrigado|pagamento|numer[aá]rio|entregue/i;
-  const lines = [];
+  const skip = /total|subtotal|iva|troco|multibanco|visa|mb way|desconto|cart[aã]o|poupan|saldo|nif|contribuinte|fatura|factura|data|hora|obrigado|pagamento|numer[aá]rio|entregue|talão|cupão|cupao|artigos|pontos/i;
+  const num = (x) => parseFloat(String(x).replace(',', '.'));
+  const out = [];
   for (const raw of (text || '').split(/\n/)) {
     const line = raw.replace(/\s+/g, ' ').trim();
-    const m = line.match(/^(?:(\d+)\s*[xX]\s*)?(.{3,}?)\s+(-?\d{1,4}[.,]\d{2})\s*(?:€|eur|[a-z])?$/i);
-    if (!m || skip.test(line)) continue;
-    const price = parseFloat(m[3].replace(',', '.'));
+    if (!line || skip.test(line)) continue;
+    const kg = line.match(/(\d+[.,]\d{1,3})\s*kg\b/i);
+    const letters = line.replace(/\d+[.,]?\d*|kg|eur|€|\/|\*|×|\bx\b/gi, '').replace(/[^a-zà-ú]/gi, '');
+    if (letters.length < 3) {
+      // linha só com números: peso ou quantidade do produto anterior
+      const prev = out[out.length - 1];
+      if (!prev) continue;
+      if (kg) prev.kg = num(kg[1]);
+      else { const q = line.match(/^(\d+)\s*[x×*]/i); if (q) prev.qty = +q[1]; }
+      continue;
+    }
+    const m = line.match(/^(?:(\d+)\s*[xX×]\s+)?(.{3,}?)\s+(-?\d{1,4}[.,]\d{2})\s*(?:€|eur|[a-z])?$/i);
+    if (!m) continue;
+    const price = num(m[3]);
     if (!(price > 0)) continue;
-    const name = m[2].replace(/^[\d\s.*%]+/, '').replace(/\s+\d+[.,]\d{2}$/, '').trim();
-    if (name.replace(/[^a-z]/gi, '').length < 3) continue;
-    lines.push({ name, qty: m[1] ? +m[1] : 1, price });
+    let name = m[2];
+    if (kg) name = name.replace(/\s*\d+[.,]\d{1,3}\s*kg.*$/i, '');
+    name = name.replace(/^[\d\s.*%]+/, '').replace(/\s+\d+[.,]\d{2}$/, '').trim();
+    if (name.replace(/[^a-zà-ú]/gi, '').length < 3) continue;
+    out.push({ name, qty: m[1] ? +m[1] : 1, price, kg: kg ? num(kg[1]) : null });
   }
-  return lines;
+  return out;
 }
 
 // ---------- Emoji do produto (quando não há fotografia) ----------

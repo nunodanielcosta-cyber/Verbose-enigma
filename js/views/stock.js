@@ -3,6 +3,8 @@ import { h, icon, empty, prefs } from '../ui.js';
 import { store } from '../store.js';
 import { GROUPS, normalize, expiryStatus, effectiveExpiry, isTracked } from '../domain.js';
 import { productRow, openProductForm, warnDays } from './product.js';
+import { openFresh } from './fresh.js';
+import { receiptFlow } from './receipt.js';
 
 export default {
   id: 'stock',
@@ -16,6 +18,9 @@ export default {
     const list = h('div', { class: 'list-groups' });
     root.append(
       h('div', { class: 'searchbar' }, icon('search', 18), search),
+      h('div', { class: 'toolbar' },
+        h('button', { class: 'btn soft', onclick: () => openFresh() }, '🥕 Frutas e legumes'),
+        h('button', { class: 'btn soft', onclick: () => receiptFlow() }, icon('receipt', 18), 'Ler talão')),
       chips, filters, list);
 
     function draw() {

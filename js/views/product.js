@@ -1,6 +1,7 @@
 // Ficha de produto, formulário de edição e escolha rápida de validade.
 import { h, icon, sheet, field, toast, fmtQty, fmtMoney, fmtDate, confirmSheet, prefs, stepper } from '../ui.js';
 import { store } from '../store.js';
+import { emojiOfProduce } from '../produce.js';
 import {
   GROUPS, UNITS, STORES, groupOf, storeOf, expiryStatus, effectiveExpiry, todayISO, addDays,
   packageBase, suggestMinMax, isTracked, productEmoji,
@@ -11,7 +12,7 @@ export const warnDays = () => prefs.get('warnDays', 5);
 /** Miniatura: imagem do produto ou emoji do grupo. */
 export function thumb(p, size = 44) {
   return h('div', { class: 'thumb', style: { width: size + 'px', height: size + 'px' } },
-    p.image_url ? h('img', { src: p.image_url, alt: '', loading: 'lazy', onerror: (e) => e.target.replaceWith(productEmoji(p)) }) : productEmoji(p));
+    p.image_url ? h('img', { src: p.image_url, alt: '', loading: 'lazy', onerror: (e) => e.target.replaceWith(emojiOfProduce(p.name) || productEmoji(p)) }) : emojiOfProduce(p.name) || productEmoji(p));
 }
 
 /** Barra de stock entre 0 e o máximo, com marca no mínimo. */
@@ -196,6 +197,7 @@ export function openProductForm(p = null, prefill = {}) {
           category: f.category.trim() || null, location: f.location.trim() || null, unit: f.unit.trim() || 'un',
           qty: num(f.qty) ?? 0, min: num(f.min) ?? 0, max: num(f.max) ?? 0, expiry: f.expiry || null,
           package_size: num(f.package_size), package_unit: f.package_unit || null, open_days: parseInt(f.open_days, 10) || null,
+          shelf_days: parseInt(f.shelf_days, 10) || null, unit_kg: num(f.unit_kg) || null,
           compare_as: f.compare_as.trim() || null, notes: f.notes.trim() || null, image_url: v.image_url || null,
         };
         if (row.max && row.min && row.max < row.min) return toast('O máximo tem de ser maior ou igual ao mínimo', { type: 'error' });
@@ -230,7 +232,10 @@ export function openProductForm(p = null, prefill = {}) {
         h('div', { class: 'grid2' },
           field('Tamanho da embalagem', inp('package_size', { type: 'number', step: 'any', min: 0, placeholder: '1' })),
           field('Unidade da embalagem', h('select', { name: 'package_unit', value: v.package_unit || '' }, ['', 'g', 'kg', 'ml', 'cl', 'L', 'un'].map((u) => h('option', { value: u }, u || '—'))))),
-        field('Dura depois de aberto (dias)', inp('open_days', { type: 'number', min: 0 })),
+        h('div', { class: 'grid2' },
+          field('Dura depois de comprado (dias)', inp('shelf_days', { type: 'number', min: 0 }), 'Validade automática ao arrumar (fruta, legumes, pão…)'),
+          field('Dura depois de aberto (dias)', inp('open_days', { type: 'number', min: 0 }))),
+        field('Peso de 1 unidade (kg)', inp('unit_kg', { type: 'number', step: 'any', min: 0, placeholder: 'ex.: 0,18' }), 'Para converter o peso do talão em unidades'),
         field('Comparar como', inp('compare_as', { placeholder: 'ex.: leite meio-gordo 1L' }), 'Termo usado para procurar a alternativa mais barata nas lojas'),
         field('Notas', inp('notes')))),
     h('div', { class: 'row-end' },
@@ -252,7 +257,7 @@ export function askQtyExpiry(p, { qty = 1, expiry = null } = {}) {
   return new Promise((resolve) => {
     let result = null;
     let q = qty;
-    let exp = expiry;
+    let exp = expiry || (p.shelf_days ? addDays(todayISO(), p.shelf_days) : null); // validade automática
     sheet(`Arrumar ${p.name}`, (close) => {
       const date = h('input', { type: 'date', value: exp || '' , onchange: (e) => { exp = e.target.value || null; } });
       const qtyBox = h('div');
@@ -281,6 +286,7 @@ export function askQtyExpiry(p, { qty = 1, expiry = null } = {}) {
 /** Junta stock novo a um produto, mantendo a validade mais próxima. */
 export function restock(p, qty, expiry, type = 'add', extra = {}) {
   const cur = store.get('products', p.id) || p;
+  if (!expiry && cur.shelf_days) expiry = addDays(todayISO(), cur.shelf_days); // ex.: bananas duram 5 dias
   const patch = {};
   if (expiry) patch.expiry = cur.qty > 0 && cur.expiry && cur.expiry < expiry ? cur.expiry : expiry;
   if (Object.keys(patch).length) store.update('products', p.id, patch);
