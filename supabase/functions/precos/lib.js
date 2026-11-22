@@ -48,6 +48,20 @@ export function withUnitPrice(o) {
   return o;
 }
 
+// Palavras que mudam o produto: se o resultado as tem e a pesquisa não, é outra variante
+// (ex.: procurar "arroz agulha" e aparecer "arroz agulha integral"). Acrescenta aqui quando apanhares casos novos.
+export const VARIANTS = new Set([
+  'integral', 'magro', 'meio', 'gordo', 'lactose', 'humido', 'humidas', 'humidos', 'toalhitas', 'light', 'zero', 'bio', 'biologico',
+  'vegetal', 'vegetais', 'codorniz', 'travel', 'maquina', 'gel', 'capsulas', 'pastilhas', 'soja', 'aveia', 'amendoa', 'arroz',
+  'coco', 'chocolate', 'morango', 'baunilha', 'descafeinado', 'infantil', 'bebe', 'basmati', 'carolino', 'vaporizado', 'thai',
+  'agulha', 'tomate', 'picante', 'fumado', 'congelado', 'ultracongelado', 'po', 'liquido', 'concentrado', 'desnatado', 'condensado',
+  'achocolatado', 'proteina', 'kids', 'mini', 'aromatizado', 'limao', 'lavanda', 'natural', 'grego', 'aguas', 'sardinha', 'salmao',
+]);
+export function extraVariants(query, resultName) {
+  const want = new Set(tokens(query));
+  return tokens(resultName).filter((w) => VARIANTS.has(w) && !want.has(w));
+}
+
 /** Semelhança (0–1) entre o que procuramos e um resultado da loja. */
 export function score(item, result) {
   const want = tokens([item.brand, item.name].filter(Boolean).join(' '));
@@ -64,6 +78,8 @@ export function score(item, result) {
   const a = item.size ? parseSize(item.size) : parseSize(item.name);
   const c = result.size || parseSize(result.name);
   if (a && c) s *= a.unit === c.unit && Math.abs(a.amount - c.amount) / a.amount <= 0.15 ? 1.1 : 0.7;
+  // variante diferente (integral, húmido, codorniz…) não é o mesmo produto
+  s *= 0.5 ** extraVariants([item.brand, item.name].join(' '), result.name).length;
   return Math.min(1, s);
 }
 
@@ -87,6 +103,9 @@ export function pickCheapest(item, results) {
     const hits = want.filter((w) => got.some((g) => g === w || (g.length > 3 && w.length > 3 && (g.startsWith(w) || w.startsWith(g))))).length;
     return want.length && hits / want.length >= 0.75;
   }).map(withUnitPrice);
+  // sem variantes diferentes (se isso deixar a lista vazia, aceita-as)
+  const same = relevant.filter((r) => !extraVariants(query, r.name).length);
+  if (same.length) relevant.splice(0, relevant.length, ...same);
   const comparable = relevant.filter((r) => r.unit_price && (!size || r.unit_label === '€/' + size.unit));
   const pool = comparable.length ? comparable : relevant;
   const key = (r) => (comparable.length ? r.unit_price : r.price);

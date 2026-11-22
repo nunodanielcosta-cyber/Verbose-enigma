@@ -17,7 +17,7 @@ const CORS = {
 type Item = { id: string; name: string; brand?: string | null; size?: string | null; compare_as?: string | null; category?: string | null };
 type Offer = Record<string, unknown> & { name: string; price: number };
 
-const { search: stores, diagnose } = createStores({ fetch, parseHTML, env: { MERCADONA_WH: Deno.env.get('MERCADONA_WH') ?? '' } }) as {
+const { search: stores, diagnose } = createStores({ fetch, parseHTML }) as {
   search: Record<string, (q: string) => Promise<Offer[]>>;
   diagnose: (store: string, q: string) => Promise<unknown>;
 };

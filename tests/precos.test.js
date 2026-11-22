@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { parseSize, parseUnitPrice, pickSame, pickCheapest, genericName, withUnitPrice } from '../supabase/functions/precos/lib.js';
-import { parseSfccGrid, mapMercadona } from '../supabase/functions/precos/stores.js';
+import { parseSfccGrid } from '../supabase/functions/precos/stores.js';
 
 test('tamanhos e preço por unidade', () => {
   assert.deepEqual(parseSize('Leite Meio-Gordo 6x1L'), { amount: 6, unit: 'L' });
@@ -54,9 +54,26 @@ test('grelha SFCC (formato de exemplo)', async (t) => {
   assert.deepEqual(out[1].size, { amount: 2, unit: 'L' });
 });
 
-test('produto Mercadona', () => {
-  const p = mapMercadona({ display_name: 'Leite meio-gordo Hacendado', packaging: 'Pacote', brand: 'Hacendado', share_url: 'https://x', price_instructions: { unit_price: '0.89', reference_price: '0.890', reference_format: 'L', unit_size: 1, size_format: 'l' } });
-  assert.equal(p.price, 0.89);
-  assert.equal(p.unit_label, '€/L');
-  assert.equal(p.name, 'Leite meio-gordo Hacendado Pacote 1 l');
+// Casos reais vistos nos sites (nov. 2026)
+test('variantes não contam como o mesmo produto', () => {
+  const arroz = [
+    { name: 'Arroz Agulha Integral Cigala', brand: 'Cigala', price: 1.28 },
+    { name: 'Arroz Agulha Cigala 1kg', brand: 'Cigala', price: 1.35 },
+  ];
+  assert.equal(pickSame({ name: 'Arroz agulha', brand: 'Cigala', size: '1kg' }, arroz).name, 'Arroz Agulha Cigala 1kg');
+  const papel = [
+    { name: 'Papel Higiénico Húmido Travel 12 Unidades', brand: 'Renova', price: 0.99 },
+    { name: 'Papel Higiénico Renova Skin Care 12 Rolos', brand: 'Renova', price: 4.79 },
+  ];
+  assert.equal(pickSame({ name: 'Papel higiénico', brand: 'Renova', size: '12un' }, papel).price, 4.79);
+  const ovos = [
+    { name: 'Ovos de Codorniz Continente', price: 1.29, unit_price: 0.107, unit_label: '€/un' },
+    { name: 'Ovos de Solo Classe M Continente 12 un', price: 2.69, unit_price: 0.224, unit_label: '€/un' },
+  ];
+  assert.equal(pickCheapest({ name: 'Ovos M' }, ovos).price, 2.69);
+  const loica = [
+    { name: 'Detergente Máquina Loiça Gel Auchan', price: 3.99, unit_price: 0.053, unit_label: '€/un' },
+    { name: 'Detergente Loiça Manual Auchan 1L', price: 0.99 },
+  ];
+  assert.equal(pickCheapest({ name: 'Detergente loiça', brand: 'Fairy' }, loica).price, 0.99);
 });

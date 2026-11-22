@@ -58,6 +58,20 @@ function withUnitPrice(o) {
   return o;
 }
 
+// Palavras que mudam o produto: se o resultado as tem e a pesquisa não, é outra variante
+// (ex.: procurar "arroz agulha" e aparecer "arroz agulha integral"). Acrescenta aqui quando apanhares casos novos.
+const VARIANTS = new Set([
+  'integral', 'magro', 'meio', 'gordo', 'lactose', 'humido', 'humidas', 'humidos', 'toalhitas', 'light', 'zero', 'bio', 'biologico',
+  'vegetal', 'vegetais', 'codorniz', 'travel', 'maquina', 'gel', 'capsulas', 'pastilhas', 'soja', 'aveia', 'amendoa', 'arroz',
+  'coco', 'chocolate', 'morango', 'baunilha', 'descafeinado', 'infantil', 'bebe', 'basmati', 'carolino', 'vaporizado', 'thai',
+  'agulha', 'tomate', 'picante', 'fumado', 'congelado', 'ultracongelado', 'po', 'liquido', 'concentrado', 'desnatado', 'condensado',
+  'achocolatado', 'proteina', 'kids', 'mini', 'aromatizado', 'limao', 'lavanda', 'natural', 'grego', 'aguas', 'sardinha', 'salmao',
+]);
+function extraVariants(query, resultName) {
+  const want = new Set(tokens(query));
+  return tokens(resultName).filter((w) => VARIANTS.has(w) && !want.has(w));
+}
+
 /** Semelhança (0–1) entre o que procuramos e um resultado da loja. */
 function score(item, result) {
   const want = tokens([item.brand, item.name].filter(Boolean).join(' '));
@@ -74,6 +88,8 @@ function score(item, result) {
   const a = item.size ? parseSize(item.size) : parseSize(item.name);
   const c = result.size || parseSize(result.name);
   if (a && c) s *= a.unit === c.unit && Math.abs(a.amount - c.amount) / a.amount <= 0.15 ? 1.1 : 0.7;
+  // variante diferente (integral, húmido, codorniz…) não é o mesmo produto
+  s *= 0.5 ** extraVariants([item.brand, item.name].join(' '), result.name).length;
   return Math.min(1, s);
 }
 
@@ -97,6 +113,9 @@ function pickCheapest(item, results) {
     const hits = want.filter((w) => got.some((g) => g === w || (g.length > 3 && w.length > 3 && (g.startsWith(w) || w.startsWith(g))))).length;
     return want.length && hits / want.length >= 0.75;
   }).map(withUnitPrice);
+  // sem variantes diferentes (se isso deixar a lista vazia, aceita-as)
+  const same = relevant.filter((r) => !extraVariants(query, r.name).length);
+  if (same.length) relevant.splice(0, relevant.length, ...same);
   const comparable = relevant.filter((r) => r.unit_price && (!size || r.unit_label === '€/' + size.unit));
   const pool = comparable.length ? comparable : relevant;
   const key = (r) => (comparable.length ? r.unit_price : r.price);
@@ -143,7 +162,7 @@ const SFCC_SITES = {
   pingodoce: {
     origin: 'https://www.pingodoce.pt',
     grid: 'https://www.pingodoce.pt/on/demandware.store/Sites-pingo-doce-Site/default/Search-UpdateGrid?q={q}&start=0&sz=24',
-    page: 'https://www.pingodoce.pt/pesquisa/?q={q}',
+    page: null, // a página /pesquisa do Pingo Doce é de receitas; só a grelha serve
   },
   auchan: {
     origin: 'https://www.auchan.pt',
@@ -153,15 +172,10 @@ const SFCC_SITES = {
 };
 
 /** Devolve { search: { loja: (q) => resultados }, diagnose(loja, q) }. */
-function createStores({ fetch, parseHTML, env = {} }) {
+function createStores({ fetch, parseHTML }) {
   const get = async (url, accept) => {
     const r = await fetch(url, { headers: { ...HEADERS, Accept: accept } });
     return { status: r.status, ok: r.ok, text: await r.text(), finalUrl: r.url || url };
-  };
-  const getJSON = async (url) => {
-    const r = await get(url, 'application/json');
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return JSON.parse(r.text);
   };
   const fill = (tpl, q) => tpl.replace('{q}', encodeURIComponent(q));
 
@@ -169,7 +183,7 @@ function createStores({ fetch, parseHTML, env = {} }) {
   // Tenta a grelha; se falhar ou vier vazia, tenta a página de pesquisa normal.
   const sfcc = (site) => async (q) => {
     let lastError = null;
-    for (const tpl of [site.grid, site.page]) {
+    for (const tpl of [site.grid, site.page].filter(Boolean)) {
       try {
         const r = await get(fill(tpl, q), 'text/html,*/*');
         if (!r.ok) { lastError = new Error(`HTTP ${r.status}`); continue; }
@@ -185,30 +199,13 @@ function createStores({ fetch, parseHTML, env = {} }) {
     continente: sfcc(SFCC_SITES.continente),
     pingodoce: sfcc(SFCC_SITES.pingodoce),
     auchan: sfcc(SFCC_SITES.auchan),
-    mercadona: mercadona({ getJSON, env }),
   };
 
   /** Mostra o que a loja devolve de facto (para acertar os seletores quando um site muda). */
   async function diagnose(store, q) {
-    if (store === 'mercadona') {
-      const out = { store };
-      try {
-        const root = await getJSON(`https://tienda.mercadona.pt/api/categories/?lang=pt`);
-        const ids = (root.results || []).flatMap((c) => (c.categories || []).map((x) => x.id));
-        out.categories = ids.length;
-        if (ids.length) {
-          const cat = await getJSON(`https://tienda.mercadona.pt/api/categories/${ids[0]}/?lang=pt`);
-          const prod = cat.categories?.[0]?.products?.[0];
-          out.sampleRaw = prod ? JSON.stringify(prod).slice(0, 1200) : JSON.stringify(cat).slice(0, 1200);
-          out.sampleParsed = prod ? mapMercadona(prod) : null;
-        }
-        out.results = (await search.mercadona(q)).slice(0, 3);
-      } catch (e) { out.error = String(e.message || e); }
-      return out;
-    }
     const site = SFCC_SITES[store];
     const attempts = [];
-    for (const tpl of [site.grid, site.page]) {
+    for (const tpl of [site.grid, site.page].filter(Boolean)) {
       const url = fill(tpl, q);
       try {
         const r = await get(url, 'text/html,*/*');
@@ -268,6 +265,10 @@ function parseSfccGrid(doc, origin) {
     const unitText = pick(tile, SFCC_SELECTORS.unitPrice)?.textContent || tile.textContent.match(/\d+[.,]\d{2}\s*€\s*\/\s*\w+/)?.[0];
     const up = parseUnitPrice(unitText);
     const sizeText = pick(tile, SFCC_SELECTORS.size)?.textContent || '';
+    // Tamanho: do texto da embalagem, do nome, ou deduzido do preço por kg/L (ex.: 0,85 € a 0,85 €/L = 1 L)
+    let size = parseSize(sizeText);
+    if (!size || size.unit === 'un') size = parseSize(name) || size;
+    if ((!size || size.unit === 'un') && up && ['kg', 'L'].includes(up.unit) && up.value > 0) size = { amount: +(price / up.value).toFixed(3), unit: up.unit };
     const link = [...tile.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')).find((hh) => /\.html|\/produto|\/p\//.test(hh));
     const img = tile.querySelector('img');
     seen.add(pid);
@@ -277,64 +278,12 @@ function parseSfccGrid(doc, origin) {
       price,
       unit_price: up?.value ?? null,
       unit_label: up ? '€/' + up.unit : null,
-      size: parseSize(sizeText) || parseSize(name),
+      size,
       url: link ? new URL(link, origin).href : null,
       image: img ? (img.getAttribute('data-src') || img.getAttribute('src')) : null,
     });
   }
   return out;
-}
-
-// ---------- Mercadona ----------
-// A loja online tem uma API JSON com as categorias e os produtos (com preço por kg/L).
-// Não há pesquisa por texto, por isso carregamos o catálogo (≈ 150 pedidos) e guardamo-lo 12 h em memória.
-// MERCADONA_WH: armazém/região (ex.: o que o site usa para o teu código postal). Opcional.
-function mercadona({ getJSON, env }) {
-  const BASE = 'https://tienda.mercadona.pt/api';
-  let cache = { at: 0, products: [] };
-  const qs = () => `?lang=pt${env.MERCADONA_WH ? `&wh=${env.MERCADONA_WH}` : ''}`;
-
-  async function catalog() {
-    if (cache.products.length && Date.now() - cache.at < 12 * 3600e3) return cache.products;
-    const root = await getJSON(`${BASE}/categories/${qs()}`);
-    const ids = (root.results || []).flatMap((c) => (c.categories || []).map((s) => s.id));
-    const products = [];
-    // poucos pedidos de cada vez, para não sobrecarregar o site
-    for (let i = 0; i < ids.length; i += 4) {
-      const batch = await Promise.all(ids.slice(i, i + 4).map((id) => getJSON(`${BASE}/categories/${id}/${qs()}`).catch(() => null)));
-      for (const cat of batch) for (const sub of cat?.categories || []) for (const p of sub.products || []) products.push(mapMercadona(p));
-    }
-    cache = { at: Date.now(), products };
-    return products;
-  }
-
-  return async (q) => {
-    const words = q.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(/\s+/).filter((w) => w.length > 2);
-    const all = await catalog();
-    return all
-      .map((p) => ({ p, hits: words.filter((w) => p._search.includes(w)).length }))
-      .filter((x) => x.hits >= Math.ceil(words.length * 0.6))
-      .sort((a, b) => b.hits - a.hits)
-      .slice(0, 30)
-      .map((x) => x.p);
-  };
-}
-
-function mapMercadona(p) {
-  const pi = p.price_instructions || {};
-  const name = [p.display_name, p.packaging, pi.unit_size && pi.size_format ? `${pi.unit_size} ${pi.size_format}` : ''].filter(Boolean).join(' ');
-  const refUnit = { l: 'L', kg: 'kg', ud: 'un', u: 'un' }[(pi.reference_format || '').toLowerCase()] || pi.reference_format;
-  return {
-    name,
-    brand: p.brand || null,
-    price: parseFloat(pi.unit_price ?? pi.bulk_price),
-    unit_price: pi.reference_price ? parseFloat(pi.reference_price) : null,
-    unit_label: refUnit ? '€/' + refUnit : null,
-    size: parseSize(name),
-    url: p.share_url || null,
-    image: p.thumbnail || null,
-    _search: (name + ' ' + (p.brand || '')).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''),
-  };
 }
 
 // ---------- index.ts ----------
@@ -354,7 +303,7 @@ const CORS = {
 type Item = { id: string; name: string; brand?: string | null; size?: string | null; compare_as?: string | null; category?: string | null };
 type Offer = Record<string, unknown> & { name: string; price: number };
 
-const { search: stores, diagnose } = createStores({ fetch, parseHTML, env: { MERCADONA_WH: Deno.env.get('MERCADONA_WH') ?? '' } }) as {
+const { search: stores, diagnose } = createStores({ fetch, parseHTML }) as {
   search: Record<string, (q: string) => Promise<Offer[]>>;
   diagnose: (store: string, q: string) => Promise<unknown>;
 };

@@ -77,16 +77,11 @@ function login(root, sb) {
   return new Promise((resolve) => {
     const { data: sub } = sb.auth.onAuthStateChange((_ev, session) => { if (session) { sub.subscription.unsubscribe(); resolve(session); } });
     const email = h('input', { type: 'email', placeholder: 'o.teu@email.pt', required: true, autocomplete: 'email', value: prefs.get('email', '') });
-    const code = h('input', { inputmode: 'numeric', placeholder: '123456', autocomplete: 'one-time-code', maxlength: 10 });
-    const step2 = h('form', {
-      class: 'stack', hidden: true, onsubmit: async (e) => {
-        e.preventDefault();
-        const { error } = await sb.auth.verifyOtp({ email: email.value.trim(), token: code.value.trim(), type: 'email' });
-        if (error) toast('Código inválido ou expirado', { type: 'error' });
-      },
-    }, field('Código recebido por email', code), h('button', { class: 'btn primary block' }, 'Entrar'),
-    h('p', { class: 'muted small' }, 'Também podes simplesmente carregar no link do email.'));
-    const step1 = h('form', {
+    const sent = h('div', { class: 'stack', hidden: true },
+      h('div', { class: 'tip' }, icon('check', 18), h('div', {}, h('strong', {}, 'Enviámos-te um email.'), ' Abre-o neste mesmo telemóvel/computador e carrega no link para entrar.')),
+      h('p', { class: 'muted small' }, 'Não chegou? Vê a pasta de spam. No iPhone: entra primeiro pelo Safari e só depois usa “Adicionar ao ecrã principal”.'),
+      h('button', { class: 'btn ghost block', onclick: () => { sent.hidden = true; form.hidden = false; } }, 'Usar outro email'));
+    const form = h('form', {
       class: 'stack', onsubmit: async (e) => {
         e.preventDefault();
         prefs.set('email', email.value.trim());
@@ -94,14 +89,15 @@ function login(root, sb) {
         btn.disabled = true;
         const { error } = await sb.auth.signInWithOtp({ email: email.value.trim(), options: { emailRedirectTo: location.origin + location.pathname } });
         btn.disabled = false;
-        if (error) return toast(error.message, { type: 'error' });
-        step2.hidden = false;
-        step1.hidden = true;
-        code.focus();
+        if (error) {
+          const msg = /rate limit/i.test(error.message) ? 'Foram pedidos demasiados emails na última hora. Tenta daqui a pouco.' : error.message;
+          return toast(msg, { type: 'error', ms: 6000 });
+        }
+        form.hidden = true;
+        sent.hidden = false;
       },
-    }, field('Email', email), h('button', { class: 'btn primary block' }, 'Enviar código de acesso'));
-    screen(root, h('h1', {}, 'Entrar'), h('p', { class: 'muted' }, 'Sem palavras-passe: enviamos-te um código por email.'), step1, step2,
-      h('button', { class: 'link small', onclick: () => { prefs.set('supabase', null); location.reload(); } }, 'Mudar de base de dados'));
+    }, field('Email', email), h('button', { class: 'btn primary block' }, 'Enviar link de acesso'));
+    screen(root, h('h1', {}, 'Entrar'), h('p', { class: 'muted' }, 'Sem palavras-passe: enviamos-te um link por email. Só é preciso fazer isto uma vez em cada dispositivo.'), form, sent);
   });
 }
 

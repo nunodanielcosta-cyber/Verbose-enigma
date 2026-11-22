@@ -22,7 +22,7 @@ export const SFCC_SITES = {
   pingodoce: {
     origin: 'https://www.pingodoce.pt',
     grid: 'https://www.pingodoce.pt/on/demandware.store/Sites-pingo-doce-Site/default/Search-UpdateGrid?q={q}&start=0&sz=24',
-    page: 'https://www.pingodoce.pt/pesquisa/?q={q}',
+    page: null, // a página /pesquisa do Pingo Doce é de receitas; só a grelha serve
   },
   auchan: {
     origin: 'https://www.auchan.pt',
@@ -32,15 +32,10 @@ export const SFCC_SITES = {
 };
 
 /** Devolve { search: { loja: (q) => resultados }, diagnose(loja, q) }. */
-export function createStores({ fetch, parseHTML, env = {} }) {
+export function createStores({ fetch, parseHTML }) {
   const get = async (url, accept) => {
     const r = await fetch(url, { headers: { ...HEADERS, Accept: accept } });
     return { status: r.status, ok: r.ok, text: await r.text(), finalUrl: r.url || url };
-  };
-  const getJSON = async (url) => {
-    const r = await get(url, 'application/json');
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return JSON.parse(r.text);
   };
   const fill = (tpl, q) => tpl.replace('{q}', encodeURIComponent(q));
 
@@ -48,7 +43,7 @@ export function createStores({ fetch, parseHTML, env = {} }) {
   // Tenta a grelha; se falhar ou vier vazia, tenta a página de pesquisa normal.
   const sfcc = (site) => async (q) => {
     let lastError = null;
-    for (const tpl of [site.grid, site.page]) {
+    for (const tpl of [site.grid, site.page].filter(Boolean)) {
       try {
         const r = await get(fill(tpl, q), 'text/html,*/*');
         if (!r.ok) { lastError = new Error(`HTTP ${r.status}`); continue; }
@@ -64,30 +59,13 @@ export function createStores({ fetch, parseHTML, env = {} }) {
     continente: sfcc(SFCC_SITES.continente),
     pingodoce: sfcc(SFCC_SITES.pingodoce),
     auchan: sfcc(SFCC_SITES.auchan),
-    mercadona: mercadona({ getJSON, env }),
   };
 
   /** Mostra o que a loja devolve de facto (para acertar os seletores quando um site muda). */
   async function diagnose(store, q) {
-    if (store === 'mercadona') {
-      const out = { store };
-      try {
-        const root = await getJSON(`https://tienda.mercadona.pt/api/categories/?lang=pt`);
-        const ids = (root.results || []).flatMap((c) => (c.categories || []).map((x) => x.id));
-        out.categories = ids.length;
-        if (ids.length) {
-          const cat = await getJSON(`https://tienda.mercadona.pt/api/categories/${ids[0]}/?lang=pt`);
-          const prod = cat.categories?.[0]?.products?.[0];
-          out.sampleRaw = prod ? JSON.stringify(prod).slice(0, 1200) : JSON.stringify(cat).slice(0, 1200);
-          out.sampleParsed = prod ? mapMercadona(prod) : null;
-        }
-        out.results = (await search.mercadona(q)).slice(0, 3);
-      } catch (e) { out.error = String(e.message || e); }
-      return out;
-    }
     const site = SFCC_SITES[store];
     const attempts = [];
-    for (const tpl of [site.grid, site.page]) {
+    for (const tpl of [site.grid, site.page].filter(Boolean)) {
       const url = fill(tpl, q);
       try {
         const r = await get(url, 'text/html,*/*');
@@ -147,6 +125,10 @@ export function parseSfccGrid(doc, origin) {
     const unitText = pick(tile, SFCC_SELECTORS.unitPrice)?.textContent || tile.textContent.match(/\d+[.,]\d{2}\s*€\s*\/\s*\w+/)?.[0];
     const up = parseUnitPrice(unitText);
     const sizeText = pick(tile, SFCC_SELECTORS.size)?.textContent || '';
+    // Tamanho: do texto da embalagem, do nome, ou deduzido do preço por kg/L (ex.: 0,85 € a 0,85 €/L = 1 L)
+    let size = parseSize(sizeText);
+    if (!size || size.unit === 'un') size = parseSize(name) || size;
+    if ((!size || size.unit === 'un') && up && ['kg', 'L'].includes(up.unit) && up.value > 0) size = { amount: +(price / up.value).toFixed(3), unit: up.unit };
     const link = [...tile.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')).find((hh) => /\.html|\/produto|\/p\//.test(hh));
     const img = tile.querySelector('img');
     seen.add(pid);
@@ -156,62 +138,10 @@ export function parseSfccGrid(doc, origin) {
       price,
       unit_price: up?.value ?? null,
       unit_label: up ? '€/' + up.unit : null,
-      size: parseSize(sizeText) || parseSize(name),
+      size,
       url: link ? new URL(link, origin).href : null,
       image: img ? (img.getAttribute('data-src') || img.getAttribute('src')) : null,
     });
   }
   return out;
-}
-
-// ---------- Mercadona ----------
-// A loja online tem uma API JSON com as categorias e os produtos (com preço por kg/L).
-// Não há pesquisa por texto, por isso carregamos o catálogo (≈ 150 pedidos) e guardamo-lo 12 h em memória.
-// MERCADONA_WH: armazém/região (ex.: o que o site usa para o teu código postal). Opcional.
-function mercadona({ getJSON, env }) {
-  const BASE = 'https://tienda.mercadona.pt/api';
-  let cache = { at: 0, products: [] };
-  const qs = () => `?lang=pt${env.MERCADONA_WH ? `&wh=${env.MERCADONA_WH}` : ''}`;
-
-  async function catalog() {
-    if (cache.products.length && Date.now() - cache.at < 12 * 3600e3) return cache.products;
-    const root = await getJSON(`${BASE}/categories/${qs()}`);
-    const ids = (root.results || []).flatMap((c) => (c.categories || []).map((s) => s.id));
-    const products = [];
-    // poucos pedidos de cada vez, para não sobrecarregar o site
-    for (let i = 0; i < ids.length; i += 4) {
-      const batch = await Promise.all(ids.slice(i, i + 4).map((id) => getJSON(`${BASE}/categories/${id}/${qs()}`).catch(() => null)));
-      for (const cat of batch) for (const sub of cat?.categories || []) for (const p of sub.products || []) products.push(mapMercadona(p));
-    }
-    cache = { at: Date.now(), products };
-    return products;
-  }
-
-  return async (q) => {
-    const words = q.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(/\s+/).filter((w) => w.length > 2);
-    const all = await catalog();
-    return all
-      .map((p) => ({ p, hits: words.filter((w) => p._search.includes(w)).length }))
-      .filter((x) => x.hits >= Math.ceil(words.length * 0.6))
-      .sort((a, b) => b.hits - a.hits)
-      .slice(0, 30)
-      .map((x) => x.p);
-  };
-}
-
-export function mapMercadona(p) {
-  const pi = p.price_instructions || {};
-  const name = [p.display_name, p.packaging, pi.unit_size && pi.size_format ? `${pi.unit_size} ${pi.size_format}` : ''].filter(Boolean).join(' ');
-  const refUnit = { l: 'L', kg: 'kg', ud: 'un', u: 'un' }[(pi.reference_format || '').toLowerCase()] || pi.reference_format;
-  return {
-    name,
-    brand: p.brand || null,
-    price: parseFloat(pi.unit_price ?? pi.bulk_price),
-    unit_price: pi.reference_price ? parseFloat(pi.reference_price) : null,
-    unit_label: refUnit ? '€/' + refUnit : null,
-    size: parseSize(name),
-    url: p.share_url || null,
-    image: p.thumbnail || null,
-    _search: (name + ' ' + (p.brand || '')).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''),
-  };
 }

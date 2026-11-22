@@ -16,7 +16,7 @@ export const STORES = [
   { id: 'continente', label: 'Continente', color: '#e30613', online: true },
   { id: 'pingodoce', label: 'Pingo Doce', color: '#5aa531', online: true },
   { id: 'auchan', label: 'Auchan', color: '#e2001a', online: true },
-  { id: 'mercadona', label: 'Mercadona', color: '#00a650', online: true },
+  { id: 'mercadona', label: 'Mercadona', color: '#00a650', online: false }, // sem loja online em Portugal: só preços manuais/talão
   { id: 'lidl', label: 'Lidl', color: '#0050aa', online: false }, // sem loja online de alimentação: só preços manuais/talão
 ];
 export const storeOf = (id) => STORES.find((s) => s.id === id) || { id, label: id, color: '#888' };
