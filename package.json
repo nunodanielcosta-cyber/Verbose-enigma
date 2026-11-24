@@ -13,7 +13,8 @@
     "test:ui": "node scripts/ui-smoke.mjs",
     "test:electron": "node scripts/electron-smoke.mjs",
     "exemplos": "node scripts/make-examples.mjs",
-    "dist:zip": "electron-builder --win zip --x64 -c.win.target=zip -c.win.artifactName=Bussola-MGF-${version}-win.${ext} --publish never"
+    "dist:zip": "electron-builder --win zip --x64 -c.win.target=zip -c.win.artifactName=Bussola-MGF-${version}-win.${ext} --publish never",
+    "manual": "node scripts/make-manual.mjs"
   },
   "build": {
     "appId": "pt.mgf.bussola",

@@ -24,6 +24,8 @@ Aplicação para **Windows** de apoio ao médico de família numa **USF modelo B
 
 Requisitos: Windows 10 ou 11, de 64 bits.
 
+📘 **Manual do utilizador:** [docs/Manual-Bussola-MGF.pdf](docs/Manual-Bussola-MGF.pdf). Explica como trabalhar com a app e como obter e preparar os dados.
+
 ## Importar os seus dados
 
 Aceita **CSV** (separador `;` ou `,`, em UTF-8 ou Windows-1252) e **Excel `.xlsx`**. Os nomes das colunas não precisam de ser exatos: a app sugere a correspondência e pode corrigi-la antes de importar. Em **Importar dados** há um «Modelo CSV» para cada tipo. A pasta [`exemplos/`](exemplos/) tem ficheiros completos com dados fictícios.
@@ -62,6 +64,7 @@ npm run test:electron   # teste de fumo da app Electron real (em Linux: xvfb-run
 npm run dist            # instalador NSIS + portátil (em Windows; em Linux precisa de Wine)
 npm run dist:zip        # versão em ZIP (funciona em qualquer sistema)
 npm run exemplos        # gera de novo os ficheiros de exemplo
+npm run manual          # gera de novo o manual em PDF (docs/Manual-Bussola-MGF.pdf)
 ```
 
 Estrutura:

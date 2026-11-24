@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<title>Bússola MGF — Manual do utilizador</title>
+<style>
+  @page { size: A4; }
+  :root { --ink:#13212a; --soft:#3b4d58; --muted:#6a7c86; --accent:#0b6e7f; --accent-soft:#e2f2f5; --line:#d9e3e7; --warn:#fbf1d9; --warn-line:#ecd9a6; --bad:#b3362a; }
+  * { box-sizing: border-box; }
+  body { margin:0; color:var(--ink); font: 10.3pt/1.5 "Segoe UI", "Noto Sans", "DejaVu Sans", Arial, sans-serif; }
+  h1 { font-size: 19pt; color: var(--accent); margin: 0 0 10pt; padding-bottom: 6pt; border-bottom: 2px solid var(--accent-soft); break-before: page; }
+  h1 .n { color: var(--muted); font-weight: 400; margin-right: 6pt; }
+  h2 { font-size: 13pt; margin: 16pt 0 6pt; break-after: avoid; }
+  h3 { font-size: 11pt; margin: 12pt 0 4pt; break-after: avoid; }
+  p { margin: 0 0 7pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 18pt; }
+  li { margin-bottom: 3pt; }
+  code, .k { font-family: Consolas, "DejaVu Sans Mono", monospace; font-size: 9pt; background: #f1f5f7; padding: 0 3pt; border-radius: 3pt; }
+  .ui { font-weight: 650; color: var(--accent); }
+  figure { margin: 8pt 0 12pt; break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid var(--line); border-radius: 6pt; display: block; }
+  figure.half img { width: 62%; margin: 0 auto; }
+  figcaption { font-size: 8.6pt; color: var(--muted); margin-top: 4pt; text-align: center; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 9pt; break-inside: auto; }
+  th, td { border: 1px solid var(--line); padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  th { background: #f3f7f9; font-weight: 650; }
+  tr { break-inside: avoid; }
+  .box { border-radius: 6pt; padding: 8pt 11pt; margin: 8pt 0 10pt; break-inside: avoid; }
+  .box.warn { background: var(--warn); border: 1px solid var(--warn-line); }
+  .box.info { background: var(--accent-soft); border: 1px solid #bfe1e8; }
+  .box.bad { background: #fbe6e3; border: 1px solid #f1c9c3; }
+  .box > :last-child { margin-bottom: 0; }
+  .box b.t { display: block; margin-bottom: 3pt; }
+  .steps { counter-reset: s; list-style: none; padding-left: 0; }
+  .steps > li { counter-increment: s; position: relative; padding-left: 22pt; margin-bottom: 5pt; }
+  .steps > li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 15pt; height: 15pt; border-radius: 50%; background: var(--accent); color: #fff; font-size: 8pt; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .cover { height: 255mm; display: flex; flex-direction: column; justify-content: center; }
+  .cover .logo { width: 70pt; height: 70pt; margin-bottom: 18pt; }
+  .cover .title { font-size: 34pt; font-weight: 800; color: var(--ink); line-height: 1.1; }
+  .cover .sub { font-size: 15pt; color: var(--soft); margin: 8pt 0 26pt; }
+  .cover .meta { color: var(--muted); font-size: 10pt; border-top: 1px solid var(--line); padding-top: 10pt; }
+  .toc { columns: 2; column-gap: 24pt; padding-left: 16pt; }
+  .toc li { break-inside: avoid; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
+  .card { border: 1px solid var(--line); border-radius: 6pt; padding: 8pt 10pt; break-inside: avoid; }
+  .card h3 { margin-top: 0; }
+  .tag { display:inline-block; font-size: 8pt; font-weight: 700; border-radius: 99pt; padding: 0 6pt; }
+  .tag.d { background:#e3f4ea; color:#157a46; } .tag.s { background:#e2f2f5; color:#0b6e7f; } .tag.m { background:#fbf1d9; color:#9a6a00; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <svg class="logo" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#0f2a33"/><circle cx="16" cy="16" r="11.5" fill="none" stroke="#5cd1de" stroke-width="2"/><path d="M16 6.5l3.4 9.5-3.4 9.5-3.4-9.5z" fill="#5cd1de"/><path d="M16 16h3.4L16 25.5z" fill="#fff" opacity=".85"/><circle cx="16" cy="16" r="1.6" fill="#0f2a33"/></svg>
+  <div class="title">Bússola MGF</div>
+  <div class="sub">Manual do utilizador<br>Como trabalhar com a app e como obter os dados</div>
+  <p style="max-width:120mm;color:var(--soft)">Apoio ao médico de família numa USF modelo B: indicadores e projeção do IDE, cuidados em falta, pré-consulta, lista e unidades ponderadas, e tarefas não presenciais.</p>
+  <div class="meta">Versão 0.1 · Windows 10/11 (64 bits)<br>As imagens deste manual usam dados de demonstração inteiramente fictícios.</div>
+</section>
+
+<h1 style="break-before:page">Índice</h1>
+<ol class="toc">
+  <li>O que é a Bússola MGF</li>
+  <li>Instalar e primeiro arranque</li>
+  <li>Configurar antes de usar dados reais</li>
+  <li>Obter os dados</li>
+  <li>Preparar e importar os ficheiros</li>
+  <li>Os meus indicadores</li>
+  <li>Cuidados em falta</li>
+  <li>Pré-consulta</li>
+  <li>Lista e unidades ponderadas</li>
+  <li>Tarefas não presenciais</li>
+  <li>Rotina de trabalho sugerida</li>
+  <li>Segurança, privacidade e cópias</li>
+  <li>Problemas frequentes</li>
+  <li>Anexo: colunas reconhecidas</li>
+</ol>
+<div class="box warn"><b class="t">Antes de começar</b>
+<p>A Bússola MGF é uma <b>ferramenta independente de apoio</b>. Não é um sistema oficial e não substitui o BI-CSP, o MIM@UF nem o SClínico. O IDE que calcula é uma <b>estimativa</b>: em caso de diferença, prevalecem sempre os valores oficiais.</p>
+<p>A qualidade dos resultados depende de dois pontos: a <b>matriz de indicadores</b> configurada (capítulo 3) e a <b>qualidade dos ficheiros</b> importados (capítulos 4 e 5).</p>
+</div>
+
+<!-- 1 -->
+<h1><span class="n">1</span>O que é a Bússola MGF</h1>
+<p>É uma aplicação para Windows que trabalha <b>sem Internet</b> e guarda os dados <b>apenas no seu computador, cifrados</b> com uma palavra-passe. Junta cinco ferramentas:</p>
+<table>
+<tr><th style="width:30%">Módulo</th><th>Responde à pergunta</th></tr>
+<tr><td><span class="ui">Os meus indicadores</span></td><td>Onde estou, onde vou chegar em dezembro ao ritmo atual e onde cada utente recuperado vale mais IDE?</td></tr>
+<tr><td><span class="ui">Cuidados em falta</span></td><td>Que utentes da minha lista têm registos em falta e por que ordem os devo convocar?</td></tr>
+<tr><td><span class="ui">Pré-consulta</span></td><td>O que devo fechar em cada consulta de hoje?</td></tr>
+<tr><td><span class="ui">Lista e UC ponderadas</span></td><td>Como é a minha lista, quantas unidades ponderadas tenho e que efeito têm novas inscrições?</td></tr>
+<tr><td><span class="ui">Tarefas não presenciais</span></td><td>O que tenho pendente (renovações, resultados, contactos) e quanto tempo isto me ocupa?</td></tr>
+</table>
+<figure><img src="img/02-inicio.png"><figcaption>Página «Início»: resumo do IDE, da agenda, dos cuidados em falta e das tarefas.</figcaption></figure>
+<h2>Que dados usa</h2>
+<div class="grid2">
+  <div class="card"><h3>Resultados de indicadores</h3><p>Valores mensais agregados (numerador e denominador) de cada indicador. Origem: BI-CSP ou MIM@UF. <b>Não contêm dados de utentes.</b></p><p>Alimentam: <i>Os meus indicadores</i>.</p></div>
+  <div class="card"><h3>Lista de utentes</h3><p>Uma linha por utente, com a data de nascimento, o sexo, os problemas ICPC-2 e as datas dos últimos registos. <b>São dados pessoais de saúde.</b></p><p>Alimenta: <i>Cuidados em falta</i>, <i>Pré-consulta</i> e <i>Lista</i>.</p></div>
+  <div class="card"><h3>Agenda do dia</h3><p>Hora e n.º de utente das consultas de hoje (opcional: também se podem adicionar à mão).</p><p>Alimenta: <i>Pré-consulta</i>.</p></div>
+  <div class="card"><h3>Tarefas</h3><p>São registadas diretamente na app. Não precisam de importação.</p><p>Alimentam: <i>Tarefas não presenciais</i>.</p></div>
+</div>
+<p>Os módulos são independentes: pode começar só pelos indicadores e importar a lista de utentes mais tarde.</p>
+
+<!-- 2 -->
+<h1><span class="n">2</span>Instalar e primeiro arranque</h1>
+<h2>Instalar</h2>
+<ol class="steps">
+  <li>Use o instalador <code>Bussola-MGF-Setup-x.y.z.exe</code> ou a versão portátil <code>Bussola-MGF-Portatil-x.y.z.exe</code>, que não precisa de instalação e pode correr de uma pasta pessoal.</li>
+  <li>O ficheiro não tem assinatura digital, por isso o Windows pode mostrar <i>«O Windows protegeu o seu PC»</i>. Clique em <span class="ui">Mais informações</span> e depois em <span class="ui">Executar mesmo assim</span>.</li>
+  <li>Se o computador for da instituição e não deixar instalar programas, use a versão portátil ou peça apoio aos serviços informáticos da ULS.</li>
+</ol>
+<h2>Definir a palavra-passe</h2>
+<figure class="half"><img src="img/01-palavra-passe.png"><figcaption>No primeiro arranque define uma palavra-passe (mínimo de 8 caracteres).</figcaption></figure>
+<div class="box bad"><b class="t">Não há recuperação de palavra-passe</b><p>Os dados são cifrados com a palavra-passe. Se a esquecer, a única opção é apagar os dados e começar de novo. Guarde-a num local seguro e faça cópias de segurança (capítulo 12).</p></div>
+<ul>
+  <li>A app <b>bloqueia sozinha</b> ao fim de 10 minutos sem atividade (pode alterar em <span class="ui">Configuração</span>). Também pode usar o botão <span class="ui">Bloquear agora</span>, no canto inferior esquerdo.</li>
+  <li>As alterações são <b>gravadas automaticamente</b>. Não há botão «Guardar».</li>
+</ul>
+<h2>Experimentar primeiro</h2>
+<p>Em <span class="ui">Importar dados → Carregar dados de demonstração</span>, a app carrega 1850 utentes, resultados mensais, uma agenda e tarefas, tudo fictício. É a melhor forma de conhecer os ecrãs antes de usar dados reais. Quando importar os seus ficheiros, os dados de demonstração são substituídos.</p>
+
+<!-- 3 -->
+<h1><span class="n">3</span>Configurar antes de usar dados reais</h1>
+<p>Em <span class="ui">Configuração</span> há cinco blocos. Os três primeiros determinam se os números estão certos.</p>
+<h2>3.1 Geral</h2>
+<ul>
+  <li><b>Ano contratual</b>: a projeção é feita para dezembro deste ano.</li>
+  <li><b>Cálculo da pontuação</b>: <i>linear</i> (entre o limite aceitável e o esperado, a pontuação sobe de 0 a 100%) ou <i>escalões</i> (aceitável = 50%). Escolha o que corresponde às regras de cálculo do IDE em vigor.</li>
+  <li><b>Meses usados na projeção</b>: 6 por omissão. Só entram meses do ano contratual.</li>
+  <li><b>Bloqueio por inatividade</b> e <b>sem consulta há (meses)</b>: 36 por omissão.</li>
+</ul>
+<h2>3.2 Matriz de indicadores (essencial)</h2>
+<div class="box warn"><b class="t">A matriz que vem com a app é um exemplo</b><p>Os indicadores EX01 a EX11 servem só para demonstração: os pesos e limiares são inventados. Substitua-os pela matriz de contratualização da sua USF.</p></div>
+<figure><img src="img/13-config-matriz.png"><figcaption>Matriz de indicadores: código, peso, sentido e intervalos aceitável e esperado.</figcaption></figure>
+<table>
+<tr><th style="width:24%">Campo</th><th>Significado</th></tr>
+<tr><td>Código</td><td>Tem de ser <b>igual ao código que aparece no ficheiro de resultados</b> (por exemplo, o código do indicador no BI-CSP/MIM@UF). É assim que a app liga os resultados à matriz.</td></tr>
+<tr><td>Peso</td><td>Ponderação do indicador no IDE. Peso 0 = o indicador aparece, mas não conta para o IDE.</td></tr>
+<tr><td>Sentido</td><td><i>Maior é melhor</i> (a maioria) ou <i>Menor é melhor</i> (por exemplo, internamentos evitáveis).</td></tr>
+<tr><td>Unidade / Mult.</td><td><code>%</code> com multiplicador 100; <code>‰</code> com 1000. Valor = numerador ÷ denominador × multiplicador.</td></tr>
+<tr><td>Aceit. mín / Esper. mín / Esper. máx / Aceit. máx</td><td>Limites dos intervalos. Deixe vazio o limite que não se aplica.</td></tr>
+</table>
+<p><b>Forma mais rápida:</b> prepare a matriz numa folha Excel com estas colunas e use <span class="ui">Importar matriz (CSV/Excel)</span>. O ficheiro <code>exemplos/matriz-exemplo.csv</code> mostra o formato. Se importar resultados com códigos que não estão na matriz, a app acrescenta-os com <b>peso 0</b> e avisa: depois basta preencher o peso e os limites.</p>
+<h2>3.3 Regras de cuidados</h2>
+<p>As regras definem o que é um «cuidado em falta». Cada regra diz:</p>
+<ul>
+  <li><b>a quem se aplica</b>: idade mínima e máxima, sexo e problemas ICPC-2 (basta ter um; <code>T90</code> também apanha <code>T90.1</code>);</li>
+  <li><b>que registo é verificado</b>: a coluna do ficheiro de utentes com a data do último registo;</li>
+  <li><b>a validade</b>, em meses: se o último registo for mais antigo, ou não existir, o cuidado está em falta;</li>
+  <li><b>o indicador</b> a que está ligada, que serve para a priorização.</li>
+</ul>
+<figure><img src="img/14-config-regras.png"><figcaption>Regras de cuidados. Ajuste-as aos critérios dos seus indicadores.</figcaption></figure>
+<div class="box info"><p>Confirme as idades, as validades e os códigos de cada regra com o «bilhete de identidade» de cada indicador contratualizado. As regras que vêm com a app são um ponto de partida.</p></div>
+<h2>3.4 Fatores de ponderação e grupos de risco</h2>
+<p>Os fatores por grupo etário (0–6 anos: 1,5; 7–64: 1; 65–74: 2; ≥ 75: 2,5) e a <b>UC de referência</b> vêm com valores clássicos do modelo B. <b>Confirme-os com o regime em vigor</b> e ajuste-os se for preciso. Os grupos de risco (diabetes, hipertensão, DPOC…) definem-se por códigos ICPC-2.</p>
+
+<!-- 4 -->
+<h1><span class="n">4</span>Obter os dados</h1>
+<p>A app não se liga a nenhum sistema: trabalha com ficheiros que exporta e importa. Este capítulo explica que ficheiro é preciso para cada módulo e onde o procurar.</p>
+<div class="box warn"><b class="t">Os nomes de relatórios e menus variam</b><p>Os sistemas de informação e os relatórios disponíveis variam entre ULS e mudam com as atualizações. Os caminhos indicados abaixo são orientações. Se não encontrar um relatório, peça ajuda ao responsável pelo MIM@UF/BI da sua USF, ao secretariado clínico ou aos serviços informáticos da ULS.</p></div>
+
+<h2>4.1 Resultados dos indicadores (BI-CSP ou MIM@UF)</h2>
+<p><b>O que a app precisa:</b> uma tabela com <b>uma linha por indicador e por mês</b> e estas colunas:</p>
+<table>
+<tr><th>Código</th><th>Período</th><th>Numerador</th><th>Denominador</th><th>(opcional) Nome / Valor</th></tr>
+<tr><td>EX03</td><td>10/2026</td><td>155</td><td>210</td><td>Diabéticos com HbA1c…</td></tr>
+</table>
+<p>Se não houver numerador e denominador, a app aceita só a coluna <b>Valor</b>. Nesse caso mostra o valor e a projeção, mas não calcula quantos utentes faltam.</p>
+<h3>Caminho no MIM@UF (orientação)</h3>
+<ol class="steps">
+  <li>Nos relatórios partilhados, abra a pasta <b>«P02. Indicadores»</b> e depois <b>«P02.01. Indicadores USF/UCSP»</b>.</li>
+  <li>Para o <b>seu painel pessoal</b>, escolha o relatório <b>por lista de utentes de médico</b> (código P02.01.R03). Para a unidade, use o relatório da unidade funcional.</li>
+  <li>Selecione o <b>período</b> (um ou mais meses), o <b>Ano Contratual</b> e, em «Grupo de Indicadores», <b>Todos os Indicadores</b>.</li>
+  <li>Clique em <b>Executar Relatório</b> e exporte para <b>Excel</b> (Home → Exportar → Excel).</li>
+</ol>
+<div class="box warn"><b class="t">Atenção ao relatório por médico</b><p>Se o ficheiro trouxer os resultados de <b>todos os médicos</b> da USF, apague no Excel as linhas dos colegas antes de importar. A app não distingue médicos: se houver várias linhas com o mesmo código e mês, fica a última.</p></div>
+<h3>Ajustar o ficheiro exportado</h3>
+<p>Os relatórios exportados costumam ter títulos, células unidas e o mês escrito no cabeçalho em vez de numa coluna. No Excel:</p>
+<ol class="steps">
+  <li>Apague as linhas de título acima da linha dos cabeçalhos. A app procura sozinha a linha de cabeçalho nas primeiras 15 linhas, mas um ficheiro limpo evita erros.</li>
+  <li>Garanta que há colunas com o <b>código do indicador</b>, o <b>numerador</b> e o <b>denominador</b>.</li>
+  <li>Se o mês só aparece no título, acrescente uma coluna <b>Período</b> e preencha-a em todas as linhas (por exemplo, <code>10/2026</code>). Exportar um mês de cada vez torna isto mais simples.</li>
+  <li>Se o relatório tiver os meses em colunas lado a lado, reorganize-o para ficar uma linha por indicador e mês.</li>
+  <li>Grave em <b>.xlsx</b> ou em <b>CSV (separado por vírgulas/ponto e vírgula)</b>.</li>
+</ol>
+<p><b>Para ter projeção</b>, importe vários meses do ano contratual (no mínimo 2; 6 é o ideal). Pode importar um ficheiro por mês: cada importação acrescenta e atualiza os meses, sem apagar os anteriores.</p>
+
+<h2>4.2 Lista de utentes com os últimos registos</h2>
+<p>É o ficheiro mais importante para os módulos <i>Cuidados em falta</i>, <i>Pré-consulta</i> e <i>Lista</i>. É uma <b>listagem nominal</b>, com uma linha por utente da sua lista:</p>
+<table>
+<tr><th style="width:34%">Coluna</th><th>Obrigatória?</th><th>Para quê</th></tr>
+<tr><td>N.º de utente / processo</td><td><span class="tag d">Sim</span></td><td>Identificar o utente (e ligar à agenda)</td></tr>
+<tr><td>Data de nascimento</td><td><span class="tag d">Sim</span></td><td>Idade, regras por idade e unidades ponderadas</td></tr>
+<tr><td>Sexo</td><td><span class="tag s">Recomendada</span></td><td>Rastreios do colo do útero e da mama; pirâmide etária</td></tr>
+<tr><td>Problemas (ICPC-2)</td><td><span class="tag s">Recomendada</span></td><td>Regras de diabetes e hipertensão; grupos de risco</td></tr>
+<tr><td>Data do último registo de cada cuidado (PA, HbA1c, pé, microalbuminúria, IMC, Td, CCR, CCU, mamografia…)</td><td><span class="tag s">Recomendada</span></td><td>Saber o que está em falta. <b>Célula vazia = sem registo = em falta.</b></td></tr>
+<tr><td>Nome, telefone</td><td><span class="tag m">Opcional</span></td><td>Identificar o utente e convocá-lo</td></tr>
+<tr><td>Última consulta</td><td><span class="tag m">Opcional</span></td><td>Utentes sem consulta há 36 meses ou mais</td></tr>
+</table>
+<h3>Onde obter</h3>
+<ul>
+  <li><b>MIM@UF / BI-CSP:</b> procure relatórios de <b>listagens nominais</b> de utentes por médico ou por indicador. Alguns indicam, para cada utente, se cumpre o critério e a data do último registo. Exporte para Excel.</li>
+  <li><b>SClínico:</b> as listagens de utentes por programa (diabetes, hipertensão, saúde da mulher…) podem dar os problemas e as datas de registo. Exporte ou copie para Excel.</li>
+  <li><b>Lista de inscritos:</b> o secretariado clínico pode obter a lista de utentes inscritos no médico de família (n.º, nome, data de nascimento, sexo, contacto).</li>
+</ul>
+<p>Muitas vezes é preciso <b>juntar várias listagens</b> numa só folha, usando o n.º de utente como chave. No Excel, a função <code>PROCX</code> (ou <code>PROCV</code>) traz para a lista de inscritos a data de cada registo vinda das outras listagens.</p>
+<div class="box info"><b class="t">Comece pelo mínimo</b><p>Uma lista com n.º, data de nascimento e sexo já permite usar o módulo <i>Lista e UC ponderadas</i>. Acrescente os problemas e as datas de registo aos poucos. Atenção: enquanto uma coluna de datas estiver vazia, todos os utentes elegíveis para essa regra aparecem «em falta».</p></div>
+<p>Pode também desativar em <span class="ui">Configuração → Regras</span> as regras para as quais ainda não tem dados.</p>
+
+<h2>4.3 Agenda do dia</h2>
+<p>Basta uma tabela com <b>Hora</b> e <b>N.º de utente</b> (opcional: <b>Tipo de consulta</b>). Pode exportar ou copiar a agenda do dia do SClínico/SINUS para Excel. Também pode dispensar o ficheiro e adicionar os utentes um a um na página <i>Pré-consulta</i>, pelo n.º ou pelo nome.</p>
+
+<!-- 5 -->
+<h1><span class="n">5</span>Preparar e importar os ficheiros</h1>
+<h2>Regras de formato</h2>
+<table>
+<tr><th style="width:28%">Elemento</th><th>Formato aceite</th></tr>
+<tr><td>Tipo de ficheiro</td><td><b>.xlsx</b> (só a primeira folha com dados) ou <b>.csv</b> (separador <code>;</code> ou <code>,</code>; UTF-8 ou Windows-1252). O <b>.xls</b> antigo não é aceite: grave como .xlsx.</td></tr>
+<tr><td>Cabeçalho</td><td>Uma linha com os nomes das colunas. Os nomes não precisam de ser exatos: a app reconhece muitas variantes e pergunta sempre.</td></tr>
+<tr><td>Datas</td><td><code>dd/mm/aaaa</code>, <code>aaaa-mm-dd</code> ou datas do Excel.</td></tr>
+<tr><td>Período (mês)</td><td><code>10/2026</code>, <code>2026-10</code>, <code>202610</code>, <code>out 2026</code>, <code>outubro de 2026</code> ou uma data desse mês.</td></tr>
+<tr><td>Números</td><td><code>1234</code>, <code>1.234,5</code>, <code>72,3%</code>.</td></tr>
+<tr><td>Problemas ICPC-2</td><td>Códigos na mesma célula, separados por espaço, vírgula ou ponto e vírgula: <code>K86 T90 T93</code>.</td></tr>
+<tr><td>Sexo</td><td><code>F</code>/<code>M</code>, <code>Feminino</code>/<code>Masculino</code>, <code>2</code>/<code>1</code>.</td></tr>
+</table>
+<p>Em <span class="ui">Importar dados</span>, cada tipo tem um botão <span class="ui">Modelo CSV</span> que grava um ficheiro vazio com as colunas certas. A pasta <code>exemplos/</code> do projeto tem ficheiros completos com dados fictícios.</p>
+<figure><img src="img/11-importar.png"><figcaption>Página «Importar dados».</figcaption></figure>
+<h2>Importar passo a passo</h2>
+<ol class="steps">
+  <li>Clique em <span class="ui">Importar</span> no cartão certo (indicadores, utentes ou agenda) e escolha o ficheiro.</li>
+  <li>A app mostra a <b>correspondência de colunas</b>. Confira cada campo (a coluna «Exemplo» mostra o valor da primeira linha) e corrija o que for preciso. Os campos com <span style="color:var(--bad)">*</span> são obrigatórios.</li>
+  <li>Clique em <span class="ui">Importar</span>. Se houver linhas com problemas (sem n.º, mês inválido…), a app mostra quais foram ignoradas.</li>
+</ol>
+<figure><img src="img/12-mapeamento.png"><figcaption>Correspondência de colunas ao importar a lista de utentes.</figcaption></figure>
+<h2>O que acontece em cada importação</h2>
+<ul>
+  <li><b>Indicadores:</b> os meses importados são acrescentados ou substituídos. Os outros meses mantêm-se.</li>
+  <li><b>Utentes:</b> a lista é <b>substituída</b>. O que marcou como «feito» e o estado dos contactos mantêm-se para os mesmos n.os de utente.</li>
+  <li><b>Agenda:</b> substitui a agenda de hoje.</li>
+</ul>
+<div class="box warn"><b class="t">Apague os ficheiros exportados</b><p>A cópia dentro da app fica cifrada, mas os ficheiros Excel/CSV exportados dos sistemas <b>não</b> ficam. Depois de importar, apague-os (incluindo da Reciclagem e das Transferências).</p></div>
+
+<!-- 6 -->
+<h1><span class="n">6</span>Os meus indicadores</h1>
+<figure><img src="img/03-indicadores.png"><figcaption>Tabela de indicadores com o painel de detalhe à direita.</figcaption></figure>
+<h2>Os quatro números do topo</h2>
+<ul>
+  <li><b>IDE estimado</b>: no período escolhido (por omissão, o último mês importado).</li>
+  <li><b>IDE projetado</b>: em dezembro, se cada indicador mantiver a tendência dos últimos meses.</li>
+  <li><b>IDE simulado</b>: o efeito dos utentes que introduzir na coluna «Simular».</li>
+  <li><b>Estado dos indicadores</b>: quantos estão no intervalo esperado, no aceitável e fora.</li>
+</ul>
+<h2>Como ler a tabela</h2>
+<table>
+<tr><th style="width:22%">Coluna</th><th>Significado</th></tr>
+<tr><td>Barra</td><td>Verde = intervalo esperado; amarelo = aceitável; traço escuro = valor atual; traço azul = projeção.</td></tr>
+<tr><td>Atual</td><td>Valor, estado e meta (limite do intervalo esperado).</td></tr>
+<tr><td>Faltam</td><td>Utentes cumpridores a mais (ou casos a menos) para chegar ao esperado, com o denominador atual, e <b>quantos por mês</b> até dezembro.</td></tr>
+<tr><td>Projeção</td><td>Valor previsto em dezembro e o estado correspondente.</td></tr>
+<tr><td>IDE/utente</td><td>Pontos de IDE ganhos por cada utente recuperado. <b>É o melhor critério para escolher onde investir.</b></td></tr>
+<tr><td>Simular</td><td>Escreva quantos utentes conta recuperar e veja o IDE simulado mudar.</td></tr>
+</table>
+<div class="grid2">
+<figure><img src="img/04-indicador-detalhe.png"><figcaption>Detalhe: evolução, projeção e explicação em texto.</figcaption></figure>
+<div>
+<h3>Painel de detalhe</h3>
+<p>Clique num indicador para ver o gráfico mês a mês com as faixas de referência, a linha tracejada da projeção e um resumo em texto: onde está, onde vai chegar e quantos utentes faltam.</p>
+<p>Se houver uma regra ligada ao indicador, o botão <span class="ui">Ver utentes em falta</span> abre a lista já filtrada.</p>
+<h3>Botões úteis</h3>
+<ul>
+<li><span class="ui">Simular todas as metas</span>: mostra o IDE máximo se todos os indicadores chegassem ao esperado.</li>
+<li><span class="ui">Ordenar por</span>: mais IDE por utente, pior estado, mais utentes em falta ou área.</li>
+<li><span class="ui">Exportar CSV</span>: para levar à reunião de equipa.</li>
+</ul>
+</div>
+</div>
+<div class="box info"><b class="t">Limites dos cálculos</b><p>A projeção é uma reta com base nos últimos meses: não prevê campanhas, sazonalidade nem alterações do denominador. A distância em utentes assume que o denominador se mantém.</p></div>
+
+<!-- 7 -->
+<h1><span class="n">7</span>Cuidados em falta</h1>
+<figure><img src="img/06-cuidados.png"><figcaption>Resumo e cumprimento por regra, calculados a partir da lista importada.</figcaption></figure>
+<p>A tabela <b>Cumprimento por regra</b> mostra, para cada regra, quantos utentes são elegíveis, quantos cumprem e quantos estão em falta. É uma forma rápida de verificar se o ficheiro está bem: valores muito diferentes dos oficiais indicam uma coluna mal mapeada ou uma regra mal definida.</p>
+<figure><img src="img/07-cuidados-lista.png"><figcaption>Lista priorizada com filtros, estado do contacto e marcação de «feito».</figcaption></figure>
+<h2>Como usar</h2>
+<ol class="steps">
+  <li>Filtre por regra, por indicador (por exemplo, o que tem mais IDE por utente), por estado do contacto ou por nome/n.º.</li>
+  <li>A <b>prioridade</b> soma, por cada cuidado em falta, 1 ponto mais um peso extra para os indicadores onde cada utente vale mais IDE.</li>
+  <li><span class="ui">Exportar para convocatória</span> grava um CSV com n.º, nome, idade, telefone e cuidados em falta, para o secretariado.</li>
+  <li><span class="ui">Marcar filtrados «A convocar»</span> regista o estado de todos os utentes visíveis. Depois atualize um a um (Convocado, Agendado, Sem contacto, Recusou).</li>
+  <li>O botão <b>✓</b> em cada cuidado regista a data de hoje como último registo. Conta até um ficheiro importado trazer uma data mais recente.</li>
+</ol>
+<div class="box warn"><p>Marcar «feito» na app <b>não regista nada no SClínico</b>. O registo clínico tem sempre de ser feito no sistema oficial; só esse conta para os indicadores.</p></div>
+
+<!-- 8 -->
+<h1><span class="n">8</span>Pré-consulta</h1>
+<figure><img src="img/08-preconsulta.png"><figcaption>Cada consulta do dia, com o que falta (a vermelho) e o que está em dia (a verde).</figcaption></figure>
+<ol class="steps">
+  <li>De manhã, clique em <span class="ui">Importar agenda</span>, ou adicione utentes pelo n.º ou pelo nome.</li>
+  <li>Cada cartão mostra a idade, os problemas, para quantos indicadores o utente conta e quais têm falhas.</li>
+  <li>Durante a consulta, registe no SClínico e carregue em <b>✓ feito</b> na app para o item desaparecer da lista de falhas.</li>
+  <li><span class="ui">Imprimir</span> ou <span class="ui">Guardar PDF</span> para uma folha de apoio. Contém dados de saúde: não a deixe em locais acessíveis e destrua-a no fim do dia.</li>
+</ol>
+<p>Um cartão cinzento indica um utente da agenda que não está na lista importada (por exemplo, um utente de outro médico ou uma inscrição recente).</p>
+
+<!-- 9 -->
+<h1><span class="n">9</span>Lista e unidades ponderadas</h1>
+<figure><img src="img/09-lista.png"><figcaption>Dimensão da lista, UC por grupo etário, simulador e pirâmide etária.</figcaption></figure>
+<ul>
+  <li><b>Unidades ponderadas</b> = soma do fator do grupo etário de cada utente. A <b>diferença</b> compara com a UC de referência configurada.</li>
+  <li><b>Simular novas inscrições</b>: escreva quantos utentes entrariam em cada grupo (números negativos simulam saídas).</li>
+  <li><b>Grupos de risco</b>: contagem por códigos ICPC-2.</li>
+  <li><b>Sem consulta há 36 meses ou mais</b>: candidatos a contacto ou a atualização da inscrição. Exportável para CSV.</li>
+</ul>
+<div class="box info"><p>As UC são calculadas com a lista importada e com os fatores configurados. Os valores oficiais de dimensão da lista (RNU) prevalecem.</p></div>
+
+<!-- 10 -->
+<h1><span class="n">10</span>Tarefas não presenciais</h1>
+<figure><img src="img/10-tarefas.png"><figcaption>Registo rápido de tarefas, lista de pendentes e estatísticas.</figcaption></figure>
+<ol class="steps">
+  <li>Registe a tarefa: tipo (renovação, resultado de MCDT, contacto indireto, email, relatório, referenciação), n.º de utente (opcional), descrição, prioridade e prazo. A tecla <b>Enter</b> na descrição também adiciona a tarefa.</li>
+  <li>Use <span class="ui">▶ Cronómetro</span> enquanto trata a tarefa, ou escreva os minutos à mão.</li>
+  <li>Feche com <span class="ui">Feito</span>, ou <span class="ui">Delegar</span> no enfermeiro de família, no secretariado clínico ou noutro médico.</li>
+  <li>As tarefas com prazo ultrapassado aparecem a vermelho.</li>
+</ol>
+<p>As <b>estatísticas</b> (7, 30 e 90 dias, ou desde sempre) mostram o número de tarefas, o tempo total e o tempo médio por tipo. São úteis para mostrar a carga não presencial na contratualização e na distribuição de trabalho da equipa. O botão <span class="ui">Exportar CSV</span> grava o detalhe.</p>
+
+<!-- 11 -->
+<h1><span class="n">11</span>Rotina de trabalho sugerida</h1>
+<table>
+<tr><th style="width:18%">Quando</th><th>O quê</th><th style="width:25%">Módulo</th></tr>
+<tr><td><b>Todos os dias</b><br>(5 min)</td><td>Importar ou criar a agenda e rever os cartões antes da primeira consulta. Registar as tarefas não presenciais à medida que surgem e fechá-las no fim do dia.</td><td>Pré-consulta<br>Tarefas</td></tr>
+<tr><td><b>Todas as semanas</b><br>(15 min)</td><td>Atualizar a lista de utentes. Filtrar os 2 ou 3 indicadores com mais IDE por utente, exportar a convocatória para o secretariado e atualizar o estado dos contactos da semana anterior.</td><td>Importar dados<br>Cuidados em falta</td></tr>
+<tr><td><b>Todos os meses</b><br>(20 min)</td><td>Importar os resultados do mês (BI-CSP/MIM@UF). Ver a projeção e decidir onde concentrar o esforço com a coluna «IDE/utente». Exportar o CSV para a reunião de equipa. Fazer uma cópia de segurança.</td><td>Os meus indicadores<br>Importar dados</td></tr>
+<tr><td><b>Início do ano contratual</b></td><td>Atualizar o ano contratual, a matriz (pesos e limiares), as regras, os fatores de ponderação e a UC de referência.</td><td>Configuração</td></tr>
+</table>
+<div class="box info"><b class="t">Dica</b><p>Concentre-se nos indicadores com <b>mais IDE por utente</b> e <b>projeção abaixo do esperado</b>. São os que mais beneficiam de esforço adicional. Um indicador que já vai chegar ao esperado ao ritmo atual não precisa de convocatórias extra.</p></div>
+
+<!-- 12 -->
+<h1><span class="n">12</span>Segurança, privacidade e cópias</h1>
+<h2>Como a app protege os dados</h2>
+<ul>
+  <li>Os dados ficam em <code>%APPDATA%\Bússola MGF\dados.bmgf</code>, cifrados com AES-256-GCM. A chave é derivada da palavra-passe com scrypt, e a palavra-passe não é guardada.</li>
+  <li>Sem Internet: a app bloqueia qualquer ligação de rede e não envia dados para lado nenhum.</li>
+  <li>Bloqueio automático por inatividade.</li>
+</ul>
+<h2>O que depende de si</h2>
+<ul>
+  <li>Use a app num computador e numa conta de Windows <b>pessoais e protegidos</b>.</li>
+  <li><b>Apague os ficheiros exportados</b> dos sistemas depois de os importar.</li>
+  <li>Os ficheiros <b>exportados pela app</b> (CSV de convocatória, PDF da pré-consulta) <b>não estão cifrados</b>: partilhe-os só por canais seguros e apague-os quando já não forem precisos.</li>
+  <li>Siga as orientações do <b>encarregado de proteção de dados</b> da sua ULS para o tratamento de dados pessoais de saúde (RGPD).</li>
+</ul>
+<h2>Cópias de segurança</h2>
+<p>Em <span class="ui">Importar dados → Exportar cópia cifrada</span> grava um ficheiro <code>.bmgf</code> que só abre com a palavra-passe em vigor nesse momento. Guarde-o numa pen ou numa pasta segura. Para mudar de computador, instale a app no novo, crie uma palavra-passe e use <span class="ui">Restaurar cópia</span>.</p>
+<h2>Apagar dados</h2>
+<p>Em <span class="ui">Configuração → Segurança e dados</span>:</p>
+<ul>
+<li><span class="ui">Apagar dados de utentes</span> remove a lista, a agenda, as marcações e os contactos, e mantém os indicadores e as tarefas.</li>
+<li><span class="ui">Apagar tudo</span> remove todos os dados da app neste computador.</li>
+</ul>
+
+<!-- 13 -->
+<h1><span class="n">13</span>Problemas frequentes</h1>
+<table>
+<tr><th style="width:36%">Problema</th><th>Solução</th></tr>
+<tr><td>O IDE estimado é diferente do oficial.</td><td>Confirme a matriz (códigos, pesos, limiares e sentido) e o modo de pontuação. Os indicadores sem dados no mês ficam de fora do cálculo, e é usado o último mês disponível. Lembre-se de que é uma estimativa.</td></tr>
+<tr><td>Um indicador aparece com peso 0 ou «Por configurar».</td><td>O código veio no ficheiro mas não estava na matriz. Preencha o peso e os limites em <i>Configuração</i>, ou corrija o código na matriz para coincidir com o do ficheiro.</td></tr>
+<tr><td>Sem projeção («—»).</td><td>São precisos pelo menos 2 meses do ano contratual. Confirme também o <i>Ano contratual</i> em Configuração.</td></tr>
+<tr><td>«Faltam» mostra «—».</td><td>O ficheiro só tem o valor, sem numerador nem denominador.</td></tr>
+<tr><td>Quase todos os utentes aparecem em falta numa regra.</td><td>A coluna de datas dessa regra está vazia ou mal mapeada. Verifique a correspondência de colunas ao importar e o campo «Registo (coluna)» da regra. Desative a regra se não tiver dados.</td></tr>
+<tr><td>Rastreios femininos sem elegíveis.</td><td>A coluna «Sexo» não foi mapeada ou tem valores não reconhecidos.</td></tr>
+<tr><td>Linhas ignoradas ao importar.</td><td>A app mostra quais e porquê (sem n.º de utente, mês inválido, sem numerador). Corrija no Excel e importe de novo.</td></tr>
+<tr><td>«O formato .xls antigo não é suportado».</td><td>No Excel, use <i>Ficheiro → Guardar como → Livro do Excel (.xlsx)</i>.</td></tr>
+<tr><td>Acentos estranhos (Ã§, Ã£…).</td><td>Grave o CSV como «CSV UTF-8» no Excel, ou importe o .xlsx diretamente.</td></tr>
+<tr><td>Utente da agenda aparece «não está na lista importada».</td><td>O n.º não coincide com a lista (por exemplo, n.º de processo na agenda e n.º SNS na lista). Use o mesmo identificador nos dois ficheiros.</td></tr>
+<tr><td>Esqueci a palavra-passe.</td><td>Não há recuperação. No ecrã de bloqueio, use «Esqueci a palavra-passe» para apagar os dados e recomeçar. Depois restaure uma cópia de segurança, se tiver uma (precisa da palavra-passe dessa cópia).</td></tr>
+<tr><td>O Windows impede a execução.</td><td>«Mais informações → Executar mesmo assim». Em computadores geridos pela ULS, peça apoio aos serviços informáticos.</td></tr>
+</table>
+
+<!-- 14 -->
+<h1><span class="n">14</span>Anexo: colunas reconhecidas</h1>
+<p>Na importação, a app compara os cabeçalhos sem acentos, maiúsculas, espaços nem pontuação. Exemplo: «N.º Utente» é lido como <code>nutente</code>. Estes nomes são reconhecidos automaticamente; qualquer outro pode ser escolhido à mão.</p>
+<h2>Lista de utentes</h2>
+<table>
+<tr><th style="width:34%">Campo</th><th>Cabeçalhos reconhecidos (exemplos)</th></tr>
+<tr><td>N.º de utente / processo *</td><td>N.º Utente, Número Utente, NUS, SNS, Utente, Processo, ID</td></tr>
+<tr><td>Data de nascimento *</td><td>Data Nascimento, Nascimento, Data Nasc, DN</td></tr>
+<tr><td>Nome · Sexo · Telefone</td><td>Nome · Sexo, Género · Telefone, Telemóvel, Contacto</td></tr>
+<tr><td>Problemas (ICPC-2)</td><td>Problemas, ICPC, ICPC2, Diagnósticos, Lista Problemas</td></tr>
+<tr><td>Última consulta</td><td>Última Consulta, Data Última Consulta</td></tr>
+<tr><td>Último registo de PA</td><td>PA, Tensão Arterial, Última PA</td></tr>
+<tr><td>Última HbA1c</td><td>HbA1c, Hemoglobina Glicada</td></tr>
+<tr><td>Último exame dos pés</td><td>Pé, Pé Diabético, Exame Pés</td></tr>
+<tr><td>Última microalbuminúria</td><td>Microalb, Microalbuminúria, ACR</td></tr>
+<tr><td>Último IMC</td><td>IMC, BMI</td></tr>
+<tr><td>Última vacina Td</td><td>Td, Vacina Td, Tétano</td></tr>
+<tr><td>Último rastreio CCR</td><td>CCR, PSOF, Colonoscopia, Rastreio CCR</td></tr>
+<tr><td>Último rastreio CCU</td><td>CCU, Citologia, HPV, Colpocitologia</td></tr>
+<tr><td>Última mamografia</td><td>Mamografia, Mamo, Rastreio Mama</td></tr>
+</table>
+<p>As colunas que não correspondem a nenhum campo são guardadas com o nome normalizado. Pode usá-las em regras próprias (Configuração → Regras → «Registo (coluna)»).</p>
+<h2>Resultados de indicadores</h2>
+<table>
+<tr><th style="width:34%">Campo</th><th>Cabeçalhos reconhecidos (exemplos)</th></tr>
+<tr><td>Código do indicador *</td><td>Código, Cod, Indicador, ID Indicador</td></tr>
+<tr><td>Período (mês) *</td><td>Período, Mês, Data, Ano Mês, Mês Referência</td></tr>
+<tr><td>Numerador · Denominador</td><td>Numerador, Num · Denominador, Den</td></tr>
+<tr><td>Valor / resultado</td><td>Valor, Resultado, Taxa, Proporção</td></tr>
+<tr><td>Nome do indicador</td><td>Nome, Designação, Descrição</td></tr>
+</table>
+<h2>Agenda</h2>
+<table>
+<tr><th style="width:34%">Campo</th><th>Cabeçalhos reconhecidos (exemplos)</th></tr>
+<tr><td>N.º de utente *</td><td>N.º Utente, Utente, Processo, SNS</td></tr>
+<tr><td>Hora · Tipo</td><td>Hora, Horário · Tipo, Tipologia, Programa</td></tr>
+</table>
+<h2>Matriz de indicadores</h2>
+<p>Colunas: <code>Código</code>, <code>Nome</code>, <code>Área</code>, <code>Peso</code>, <code>Sentido</code> (maior/menor), <code>Unidade</code> (% ou ‰), <code>Multiplicador</code>, <code>Aceitável mín.</code>, <code>Esperado mín.</code>, <code>Esperado máx.</code> e <code>Aceitável máx.</code>. Veja <code>exemplos/matriz-exemplo.csv</code>.</p>
+
+</body>
+</html>
