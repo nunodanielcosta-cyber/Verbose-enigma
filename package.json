@@ -1,0 +1,68 @@
+{
+  "name": "bussola-mgf",
+  "productName": "Bússola MGF",
+  "version": "0.1.0",
+  "description": "Apoio ao médico de família numa USF modelo B: indicadores, cuidados em falta, pré-consulta, lista de utentes e tarefas não presenciais.",
+  "main": "src/main/main.cjs",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "dist": "electron-builder --win nsis portable --x64 --publish never",
+    "test:ui": "node scripts/ui-smoke.mjs",
+    "test:electron": "node scripts/electron-smoke.mjs",
+    "exemplos": "node scripts/make-examples.mjs",
+    "dist:zip": "electron-builder --win zip --x64 -c.win.target=zip --publish never"
+  },
+  "build": {
+    "appId": "pt.mgf.bussola",
+    "productName": "Bússola MGF",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Bussola-MGF-Setup-${version}.exe",
+      "installerLanguages": [
+        "pt_PT"
+      ],
+      "language": "2070",
+      "createDesktopShortcut": true,
+      "shortcutName": "Bússola MGF"
+    },
+    "portable": {
+      "artifactName": "Bussola-MGF-Portatil-${version}.exe"
+    },
+    "electronLanguages": [
+      "pt-PT",
+      "en-US"
+    ],
+    "zip": {
+      "artifactName": "Bussola-MGF-${version}-win.zip"
+    }
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  },
+  "devDependencies": {
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0"
+  },
+  "type": "module",
+  "author": "Bússola MGF"
+}

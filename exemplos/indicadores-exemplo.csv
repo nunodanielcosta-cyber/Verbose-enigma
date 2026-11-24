@@ -1,0 +1,243 @@
+﻿Código;Indicador;Período;Numerador;Denominador
+EX01;Hipertensos com PA registada no último semestre;01/2025;290;520
+EX01;Hipertensos com PA registada no último semestre;02/2025;302;521
+EX01;Hipertensos com PA registada no último semestre;03/2025;313;520
+EX01;Hipertensos com PA registada no último semestre;04/2025;313;520
+EX01;Hipertensos com PA registada no último semestre;05/2025;329;520
+EX01;Hipertensos com PA registada no último semestre;06/2025;339;523
+EX01;Hipertensos com PA registada no último semestre;07/2025;347;522
+EX01;Hipertensos com PA registada no último semestre;08/2025;356;517
+EX01;Hipertensos com PA registada no último semestre;09/2025;359;518
+EX01;Hipertensos com PA registada no último semestre;10/2025;372;519
+EX01;Hipertensos com PA registada no último semestre;11/2025;382;516
+EX01;Hipertensos com PA registada no último semestre;12/2025;395;521
+EX01;Hipertensos com PA registada no último semestre;01/2026;291;523
+EX01;Hipertensos com PA registada no último semestre;02/2026;305;523
+EX01;Hipertensos com PA registada no último semestre;03/2026;307;521
+EX01;Hipertensos com PA registada no último semestre;04/2026;313;516
+EX01;Hipertensos com PA registada no último semestre;05/2026;334;525
+EX01;Hipertensos com PA registada no último semestre;06/2026;332;516
+EX01;Hipertensos com PA registada no último semestre;07/2026;348;518
+EX01;Hipertensos com PA registada no último semestre;08/2026;357;521
+EX01;Hipertensos com PA registada no último semestre;09/2026;367;516
+EX01;Hipertensos com PA registada no último semestre;10/2026;381;523
+EX02;Hipertensos < 65 anos com PA < 150/90;01/2025;159;375
+EX02;Hipertensos < 65 anos com PA < 150/90;02/2025;165;383
+EX02;Hipertensos < 65 anos com PA < 150/90;03/2025;174;380
+EX02;Hipertensos < 65 anos com PA < 150/90;04/2025;178;380
+EX02;Hipertensos < 65 anos com PA < 150/90;05/2025;186;376
+EX02;Hipertensos < 65 anos com PA < 150/90;06/2025;191;375
+EX02;Hipertensos < 65 anos com PA < 150/90;07/2025;198;381
+EX02;Hipertensos < 65 anos com PA < 150/90;08/2025;208;379
+EX02;Hipertensos < 65 anos com PA < 150/90;09/2025;210;379
+EX02;Hipertensos < 65 anos com PA < 150/90;10/2025;213;382
+EX02;Hipertensos < 65 anos com PA < 150/90;11/2025;224;383
+EX02;Hipertensos < 65 anos com PA < 150/90;12/2025;227;381
+EX02;Hipertensos < 65 anos com PA < 150/90;01/2026;162;383
+EX02;Hipertensos < 65 anos com PA < 150/90;02/2026;163;376
+EX02;Hipertensos < 65 anos com PA < 150/90;03/2026;176;381
+EX02;Hipertensos < 65 anos com PA < 150/90;04/2026;176;379
+EX02;Hipertensos < 65 anos com PA < 150/90;05/2026;187;384
+EX02;Hipertensos < 65 anos com PA < 150/90;06/2026;196;381
+EX02;Hipertensos < 65 anos com PA < 150/90;07/2026;200;384
+EX02;Hipertensos < 65 anos com PA < 150/90;08/2026;205;379
+EX02;Hipertensos < 65 anos com PA < 150/90;09/2026;209;380
+EX02;Hipertensos < 65 anos com PA < 150/90;10/2026;214;384
+EX03;Diabéticos com HbA1c no último semestre;01/2025;120;209
+EX03;Diabéticos com HbA1c no último semestre;02/2025;120;206
+EX03;Diabéticos com HbA1c no último semestre;03/2025;130;210
+EX03;Diabéticos com HbA1c no último semestre;04/2025;129;206
+EX03;Diabéticos com HbA1c no último semestre;05/2025;136;211
+EX03;Diabéticos com HbA1c no último semestre;06/2025;144;215
+EX03;Diabéticos com HbA1c no último semestre;07/2025;144;211
+EX03;Diabéticos com HbA1c no último semestre;08/2025;147;210
+EX03;Diabéticos com HbA1c no último semestre;09/2025;149;212
+EX03;Diabéticos com HbA1c no último semestre;10/2025;158;215
+EX03;Diabéticos com HbA1c no último semestre;11/2025;155;206
+EX03;Diabéticos com HbA1c no último semestre;12/2025;159;211
+EX03;Diabéticos com HbA1c no último semestre;01/2026;122;208
+EX03;Diabéticos com HbA1c no último semestre;02/2026;126;209
+EX03;Diabéticos com HbA1c no último semestre;03/2026;131;212
+EX03;Diabéticos com HbA1c no último semestre;04/2026;128;208
+EX03;Diabéticos com HbA1c no último semestre;05/2026;136;210
+EX03;Diabéticos com HbA1c no último semestre;06/2026;138;207
+EX03;Diabéticos com HbA1c no último semestre;07/2026;142;208
+EX03;Diabéticos com HbA1c no último semestre;08/2026;145;211
+EX03;Diabéticos com HbA1c no último semestre;09/2026;147;207
+EX03;Diabéticos com HbA1c no último semestre;10/2026;158;214
+EX04;Diabéticos com exame dos pés no último ano;01/2025;96;205
+EX04;Diabéticos com exame dos pés no último ano;02/2025;103;214
+EX04;Diabéticos com exame dos pés no último ano;03/2025;107;212
+EX04;Diabéticos com exame dos pés no último ano;04/2025;108;205
+EX04;Diabéticos com exame dos pés no último ano;05/2025;114;210
+EX04;Diabéticos com exame dos pés no último ano;06/2025;119;213
+EX04;Diabéticos com exame dos pés no último ano;07/2025;119;206
+EX04;Diabéticos com exame dos pés no último ano;08/2025;131;211
+EX04;Diabéticos com exame dos pés no último ano;09/2025;135;213
+EX04;Diabéticos com exame dos pés no último ano;10/2025;142;215
+EX04;Diabéticos com exame dos pés no último ano;11/2025;137;207
+EX04;Diabéticos com exame dos pés no último ano;12/2025;145;209
+EX04;Diabéticos com exame dos pés no último ano;01/2026;96;210
+EX04;Diabéticos com exame dos pés no último ano;02/2026;97;206
+EX04;Diabéticos com exame dos pés no último ano;03/2026;104;208
+EX04;Diabéticos com exame dos pés no último ano;04/2026;111;212
+EX04;Diabéticos com exame dos pés no último ano;05/2026;113;208
+EX04;Diabéticos com exame dos pés no último ano;06/2026;119;209
+EX04;Diabéticos com exame dos pés no último ano;07/2026;125;208
+EX04;Diabéticos com exame dos pés no último ano;08/2026;126;207
+EX04;Diabéticos com exame dos pés no último ano;09/2026;132;208
+EX04;Diabéticos com exame dos pés no último ano;10/2026;137;211
+EX05;Diabéticos com microalbuminúria no último ano;01/2025;99;206
+EX05;Diabéticos com microalbuminúria no último ano;02/2025;107;213
+EX05;Diabéticos com microalbuminúria no último ano;03/2025;110;213
+EX05;Diabéticos com microalbuminúria no último ano;04/2025;112;211
+EX05;Diabéticos com microalbuminúria no último ano;05/2025;119;212
+EX05;Diabéticos com microalbuminúria no último ano;06/2025;119;206
+EX05;Diabéticos com microalbuminúria no último ano;07/2025;122;212
+EX05;Diabéticos com microalbuminúria no último ano;08/2025;122;206
+EX05;Diabéticos com microalbuminúria no último ano;09/2025;126;206
+EX05;Diabéticos com microalbuminúria no último ano;10/2025;135;211
+EX05;Diabéticos com microalbuminúria no último ano;11/2025;137;211
+EX05;Diabéticos com microalbuminúria no último ano;12/2025;141;212
+EX05;Diabéticos com microalbuminúria no último ano;01/2026;105;213
+EX05;Diabéticos com microalbuminúria no último ano;02/2026;104;207
+EX05;Diabéticos com microalbuminúria no último ano;03/2026;109;211
+EX05;Diabéticos com microalbuminúria no último ano;04/2026;111;211
+EX05;Diabéticos com microalbuminúria no último ano;05/2026;121;214
+EX05;Diabéticos com microalbuminúria no último ano;06/2026;122;214
+EX05;Diabéticos com microalbuminúria no último ano;07/2026;121;210
+EX05;Diabéticos com microalbuminúria no último ano;08/2026;126;208
+EX05;Diabéticos com microalbuminúria no último ano;09/2026;129;206
+EX05;Diabéticos com microalbuminúria no último ano;10/2026;134;210
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;01/2025;231;645
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;02/2025;231;640
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;03/2025;241;636
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;04/2025;248;636
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;05/2025;261;644
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;06/2025;278;641
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;07/2025;285;644
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;08/2025;293;643
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;09/2025;304;636
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;10/2025;319;639
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;11/2025;325;639
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;12/2025;338;644
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;01/2026;223;640
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;02/2026;240;638
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;03/2026;245;640
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;04/2026;251;640
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;05/2026;272;638
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;06/2026;276;639
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;07/2026;280;637
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;08/2026;298;635
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;09/2026;304;642
+EX06;Utentes 50-74 anos com rastreio do cancro colorretal;10/2026;313;637
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;01/2025;209;473
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;02/2025;217;471
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;03/2025;224;469
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;04/2025;234;474
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;05/2025;235;472
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;06/2025;236;466
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;07/2025;251;472
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;08/2025;254;474
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;09/2025;266;466
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;10/2025;274;469
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;11/2025;280;471
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;12/2025;290;475
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;01/2026;207;467
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;02/2026;215;472
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;03/2026;223;465
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;04/2026;230;466
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;05/2026;237;473
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;06/2026;244;474
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;07/2026;250;466
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;08/2026;250;467
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;09/2026;260;474
+EX07;Mulheres 25-64 anos com rastreio do cancro do colo do útero;10/2026;268;472
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;01/2025;120;228
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;02/2025;128;233
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;03/2025;132;235
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;04/2025;134;233
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;05/2025;134;229
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;06/2025;139;234
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;07/2025;138;230
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;08/2025;144;232
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;09/2025;145;227
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;10/2025;149;228
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;11/2025;149;226
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;12/2025;157;229
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;01/2026;121;231
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;02/2026;124;227
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;03/2026;124;226
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;04/2026;133;234
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;05/2026;136;234
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;06/2026;135;228
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;07/2026;138;225
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;08/2026;143;231
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;09/2026;149;232
+EX08;Mulheres 50-69 anos com mamografia nos últimos 2 anos;10/2026;153;235
+EX09;Adultos com vacina Td atualizada;01/2025;952;1347
+EX09;Adultos com vacina Td atualizada;02/2025;951;1346
+EX09;Adultos com vacina Td atualizada;03/2025;980;1354
+EX09;Adultos com vacina Td atualizada;04/2025;990;1346
+EX09;Adultos com vacina Td atualizada;05/2025;1010;1353
+EX09;Adultos com vacina Td atualizada;06/2025;1045;1345
+EX09;Adultos com vacina Td atualizada;07/2025;1051;1345
+EX09;Adultos com vacina Td atualizada;08/2025;1070;1353
+EX09;Adultos com vacina Td atualizada;09/2025;1091;1345
+EX09;Adultos com vacina Td atualizada;10/2025;1094;1345
+EX09;Adultos com vacina Td atualizada;11/2025;1128;1350
+EX09;Adultos com vacina Td atualizada;12/2025;1137;1354
+EX09;Adultos com vacina Td atualizada;01/2026;961;1347
+EX09;Adultos com vacina Td atualizada;02/2026;960;1346
+EX09;Adultos com vacina Td atualizada;03/2026;971;1345
+EX09;Adultos com vacina Td atualizada;04/2026;1004;1353
+EX09;Adultos com vacina Td atualizada;05/2026;1031;1349
+EX09;Adultos com vacina Td atualizada;06/2026;1053;1350
+EX09;Adultos com vacina Td atualizada;07/2026;1053;1351
+EX09;Adultos com vacina Td atualizada;08/2026;1084;1352
+EX09;Adultos com vacina Td atualizada;09/2026;1094;1352
+EX09;Adultos com vacina Td atualizada;10/2026;1112;1349
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;01/2025;681;1405
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;02/2025;699;1401
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;03/2025;715;1401
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;04/2025;741;1401
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;05/2025;769;1403
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;06/2025;807;1397
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;07/2025;840;1399
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;08/2025;842;1397
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;09/2025;858;1404
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;10/2025;883;1400
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;11/2025;935;1404
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;12/2025;934;1404
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;01/2026;679;1401
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;02/2026;700;1399
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;03/2026;713;1395
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;04/2026;743;1396
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;05/2026;770;1401
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;06/2026;798;1397
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;07/2026;826;1401
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;08/2026;860;1404
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;09/2026;861;1399
+EX10;Utentes ≥ 18 anos com IMC registado nos últimos 3 anos;10/2026;884;1402
+EX11;Internamentos evitáveis (por 1000 utentes);01/2025;10;1850
+EX11;Internamentos evitáveis (por 1000 utentes);02/2025;9;1850
+EX11;Internamentos evitáveis (por 1000 utentes);03/2025;11;1850
+EX11;Internamentos evitáveis (por 1000 utentes);04/2025;10;1850
+EX11;Internamentos evitáveis (por 1000 utentes);05/2025;9;1850
+EX11;Internamentos evitáveis (por 1000 utentes);06/2025;11;1850
+EX11;Internamentos evitáveis (por 1000 utentes);07/2025;10;1850
+EX11;Internamentos evitáveis (por 1000 utentes);08/2025;10;1850
+EX11;Internamentos evitáveis (por 1000 utentes);09/2025;10;1850
+EX11;Internamentos evitáveis (por 1000 utentes);10/2025;9;1850
+EX11;Internamentos evitáveis (por 1000 utentes);11/2025;9;1850
+EX11;Internamentos evitáveis (por 1000 utentes);12/2025;9;1850
+EX11;Internamentos evitáveis (por 1000 utentes);01/2026;10;1850
+EX11;Internamentos evitáveis (por 1000 utentes);02/2026;11;1850
+EX11;Internamentos evitáveis (por 1000 utentes);03/2026;10;1850
+EX11;Internamentos evitáveis (por 1000 utentes);04/2026;12;1850
+EX11;Internamentos evitáveis (por 1000 utentes);05/2026;11;1850
+EX11;Internamentos evitáveis (por 1000 utentes);06/2026;11;1850
+EX11;Internamentos evitáveis (por 1000 utentes);07/2026;10;1850
+EX11;Internamentos evitáveis (por 1000 utentes);08/2026;11;1850
+EX11;Internamentos evitáveis (por 1000 utentes);09/2026;10;1850
+EX11;Internamentos evitáveis (por 1000 utentes);10/2026;12;1850

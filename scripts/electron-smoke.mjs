@@ -1,0 +1,60 @@
+// Teste de fumo da app Electron real (protocolo interno, IPC, cifra, bloqueio).
+// Uso (Linux sem ecrã): xvfb-run -a node scripts/electron-smoke.mjs
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+
+const require = createRequire(import.meta.url);
+const { _electron: electron } = require('playwright');
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bussola-e2e-'));
+const launch = () => electron.launch({ executablePath: require('electron'), args: ['--no-sandbox', ROOT], env: { ...process.env, BUSSOLA_DATA_DIR: dataDir } });
+const fail = (m) => { console.error('FALHA:', m); process.exit(1); };
+
+let app = await launch();
+let win = await app.firstWindow();
+const errors = [];
+win.on('pageerror', (e) => errors.push(e.message));
+await win.getByText('Defina uma palavra-passe').waitFor({ timeout: 15000 });
+console.log('ok    janela abriu em', win.url());
+await win.locator('input[type=password]').nth(0).fill('segredo123');
+await win.locator('input[type=password]').nth(1).fill('segredo123');
+await win.getByRole('button', { name: 'Criar e entrar' }).click();
+await win.getByRole('button', { name: 'Experimentar com dados de demonstração' }).click();
+await win.getByText('IDE projetado').first().waitFor();
+console.log('ok    demonstração carregada');
+const blocked = await win.evaluate(() => fetch('https://example.com').then(() => 'passou', () => 'bloqueado'));
+if (blocked !== 'bloqueado') fail('acesso à Internet não está bloqueado');
+console.log('ok    acesso à Internet bloqueado');
+const nodeAccess = await win.evaluate(() => typeof require === 'undefined' && typeof process === 'undefined');
+if (!nodeAccess) fail('a interface tem acesso a Node');
+console.log('ok    interface isolada (sem Node)');
+await win.waitForTimeout(800);
+await win.getByRole('button', { name: 'Bloquear agora' }).click();
+await win.getByText('Os dados estão bloqueados').waitFor();
+console.log('ok    bloqueio');
+const file = path.join(dataDir, 'dados.bmgf');
+const raw = fs.readFileSync(file, 'utf8');
+if (raw.includes('fictício') || raw.includes('EX01')) fail('ficheiro de dados legível');
+console.log('ok    ficheiro cifrado (' + Math.round(raw.length / 1024) + ' KB)');
+await win.locator('input[type=password]').fill('errada');
+await win.getByRole('button', { name: 'Desbloquear' }).click();
+await win.getByText('Palavra-passe incorreta').waitFor();
+console.log('ok    palavra-passe errada recusada');
+await app.close();
+
+app = await launch();
+win = await app.firstWindow();
+await win.getByText('Os dados estão bloqueados').waitFor({ timeout: 15000 });
+await win.locator('input[type=password]').fill('segredo123');
+await win.getByRole('button', { name: 'Desbloquear' }).click();
+await win.getByRole('button', { name: /Lista e UC/ }).click();
+const n = await win.locator('.kpi', { hasText: 'Utentes inscritos' }).locator('.kpi-value').textContent();
+if (n.trim() !== '1850') fail('dados não persistiram: ' + n);
+console.log('ok    dados persistem após reiniciar (' + n + ' utentes)');
+await app.close();
+fs.rmSync(dataDir, { recursive: true, force: true });
+if (errors.length) fail(errors.join('\n'));
+console.log('\nTudo OK');
